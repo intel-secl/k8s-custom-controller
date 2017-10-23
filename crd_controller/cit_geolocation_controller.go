@@ -1,7 +1,9 @@
 package crd_controller
 
 import (
+         "fmt"
          "time"
+	"strings"
 	"cit_custom_controller/crd_label_annotate"
         "github.com/golang/glog"
 	"k8s.io/client-go/rest"
@@ -138,7 +140,7 @@ func AddGeoTabObj(geoobj *geolocation_schema.Geolocationcrd, helper crd_label_an
 			glog.Infof("failed to get node: %s", err.Error())
 			return
 		}
-		lbl, ann := getGlObjLabel(ele)
+		lbl, ann := GetGlObjLabel(ele)
 		helper.AddLabelsAnnotations(node, lbl, ann)
 		err = helper.UpdateNode(cli, node)
 		if err != nil {
@@ -154,16 +156,19 @@ func getGlAssettag(obj geolocation_schema.HostList) crd_label_annotate.Labels {
 	//fmt.Printf("Number of keys in AssetTag: %d \n", size)
 	var lbl = make(crd_label_annotate.Labels, size+1)
 	for key, val := range obj.Assettag {
-		lbl[key] = val
+		labelkey := strings.Replace(key, " ", ".", -1)
+		labelkey = strings.Replace(labelkey, ":", ".", -1)
+		lbl[labelkey] = val
 	}
 	return lbl
 }
 
-//getGlObjLabel creates lables and annotations map based on GL CRD
-func getGlObjLabel(obj geolocation_schema.HostList) (crd_label_annotate.Labels, crd_label_annotate.Annotations) {
+//GetGlObjLabel creates lables and annotations map based on GL CRD
+func GetGlObjLabel(obj geolocation_schema.HostList) (crd_label_annotate.Labels, crd_label_annotate.Annotations) {
 	var annotation = make(crd_label_annotate.Annotations, 1)
 	lbl := getGlAssettag(obj)
-	lbl[assetexpiry] = obj.AssetTagExpiry
+	assetexpiryval := strings.Replace(obj.AssetTagExpiry, ":", ".", -1 )
+	lbl[assetexpiry] = assetexpiryval
 	annotation[assetsignreport] = obj.AssetTagSignedReport
 	return lbl, annotation
 }

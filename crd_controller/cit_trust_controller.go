@@ -1,7 +1,9 @@
 package crd_controller
 
 import (
+         "fmt"
          "time"
+         "strings"
 	"cit_custom_controller/crd_label_annotate"
         "github.com/golang/glog"
 	trust_schema "cit_custom_controller/crd_schema/cit_trust_schema"
@@ -141,11 +143,12 @@ func (c *citTLController) runWorker() {
         }
 }
 
-//getTlObjLabel creates lables and annotations map based on TL CRD
-func getTlObjLabel(obj trust_schema.HostList) (crd_label_annotate.Labels, crd_label_annotate.Annotations) {
+//GetTlObjLabel creates lables and annotations map based on TL CRD
+func GetTlObjLabel(obj trust_schema.HostList) (crd_label_annotate.Labels, crd_label_annotate.Annotations) {
         var lbl = make(crd_label_annotate.Labels, 2)
         var annotation = make(crd_label_annotate.Annotations, 1)
-        lbl[trustexpiry] = obj.TrustTagExpiry
+        expiry := strings.Replace(obj.TrustTagExpiry, ":", ".", -1)
+        lbl[trustexpiry] = expiry
         lbl[trustlabel] = obj.Trusted
         annotation[trustsignreport] = obj.TrustTagSignedReport
 
@@ -162,7 +165,7 @@ func AddTrustTabObj(trustobj *trust_schema.Trustcrd, helper crd_label_annotate.A
         		glog.Info("Failed to get node within cluster: %s", err.Error())
 			return
 		}
-		lbl, ann := getTlObjLabel(ele)
+		lbl, ann := GetTlObjLabel(ele)
 		helper.AddLabelsAnnotations(node, lbl, ann)
 		err = helper.UpdateNode(cli, node)
 		if err != nil {

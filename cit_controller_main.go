@@ -25,7 +25,7 @@ func GetClientConfig(kubeconfig string) (*rest.Config, error) {
 func main() {
 
 	glog.V(4).Infof("Starting Cit Custom Controller")
-	kubeconf := flag.String("kubeconf", "admin.conf", "Path to a kube config. Only required if out-of-cluster.")
+	kubeconf := flag.String("kubeconf", "", "Path to a kube config. Only required if out-of-cluster.")
 	flag.Parse()
 
 	config, err := GetClientConfig(*kubeconf)
