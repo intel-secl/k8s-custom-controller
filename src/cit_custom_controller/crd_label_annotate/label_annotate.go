@@ -1,12 +1,12 @@
 /*
-Copyright 2017 
+Copyright 2017
 */
 package crd_label_annotate
 
 import (
 	"github.com/golang/glog"
-	k8sclient "k8s.io/client-go/kubernetes"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	k8sclient "k8s.io/client-go/kubernetes"
 	api "k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/rest"
 )

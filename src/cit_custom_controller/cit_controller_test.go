@@ -1,11 +1,11 @@
 /*
-Copyright 2017 
+Copyright 2017
 
 */
 package main
 
 import (
-        "testing"
+	"testing"
 )
 
 func TestCitMain(t *testing.T) {

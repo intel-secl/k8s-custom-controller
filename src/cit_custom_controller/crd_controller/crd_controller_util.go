@@ -1,20 +1,20 @@
 package crd_controller
 
 import (
-	"time"
 	"github.com/golang/glog"
 	apiextensionsv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
 	clientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"time"
 )
 
 const (
-	trustexpiry = "TrustTagExpiry"
-	trustlabel = "trusted"
+	trustexpiry     = "TrustTagExpiry"
+	trustlabel      = "trusted"
 	trustsignreport = "TrustTagSignedReport"
-	assetexpiry = "AssetTagExpiry"
+	assetexpiry     = "AssetTagExpiry"
 	assetsignreport = "AssetTagSignedReport"
 )
 
@@ -38,7 +38,6 @@ func NewCitCustomResourceDefinition(cs clientset.Interface, crdDef *CrdDefinitio
 				Kind:     crdDef.Kind,
 			},
 			Scope: apiextensionsv1beta1.NamespaceScoped,
-				
 		},
 	}
 	_, err := cs.ApiextensionsV1beta1().CustomResourceDefinitions().Create(crd)

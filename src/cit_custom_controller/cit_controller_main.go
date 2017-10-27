@@ -1,12 +1,12 @@
 /*
-Copyright 2017 
+Copyright 2017
 
 */
 package main
 
 import (
-	"flag"
 	"cit_custom_controller/crd_controller"
+	"flag"
 	"github.com/golang/glog"
 	apiextcs "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/client-go/rest"
