@@ -17,7 +17,8 @@ Installation of binary
 ##############################################################################
 Pre-requisites
 1. Kubernetes cluster should be up and running
-2. TLS certificates should be configured (run script)
-3. Copy the binary from bin folder and config file from src folder to root folder 
-Install this binary on kubernetes master
+2. Copy the binary from bin folder to /opt folder 
+	mv  citk8scontroller-1.0-SNAPSHOT /opt/.
+3. Run the custom controller	
+	service citk8scontroller start
 
