@@ -1,0 +1,47 @@
+##############################################################################
+Pre-requisites for building the controller from source
+##############################################################################
+Note: You can skip installation of pre-requisites if already installed.
+
+1. Follow steps given in pre-requisites_README on kubernetes master.
+
+2. Run below command from terminal inside the source directory
+
+   mvn package
+
+3. On build success, you can find the executable binary in the "bin" folder
+
+##############################################################################
+Installation of binary on kubernetes master machine
+##############################################################################
+Pre-requisites
+Kubernetes cluster should be up and running
+
+STEPS:
+1. Create cit_k8s_extensions folders in /opt of k8s master machine.
+   Copy the binary to /opt/cit_k8s_extensions/bin folder
+   
+	mkdir /opt/cit_k8s_extensions
+	mkdir /opt/cit_k8s_extensions/bin
+    cp  citk8scontroller-1.0-SNAPSHOT /opt/cit_k8s_extensions/bin/.
+	chmod +x /opt/cit_k8s_extensions/bin/citk8scontroller-1.0-SNAPSHOT
+
+2. Place below systemd service file in /etc/systemd/system/ folder (available in the same directory as this README)
+		citk8scontroller.service
+
+3. Run below commands to enable service daemon
+	systemctl daemon-reload  #(to activate newly added service)
+	systemctl enable citk8scontroller.service
+
+4. Run the custom controller using below command	
+
+	systemctl start citk8scontroller.service
+
+5. To check status of this service run below command
+	
+	systemctl status citk8scontroller.service
+
+6. To stop this service run below command
+	
+	systemctl stop citk8scontroller.service
+
