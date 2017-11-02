@@ -19,10 +19,8 @@ Kubernetes cluster should be up and running
 
 STEPS:
 1. Create cit_k8s_extensions folders in /opt of k8s master machine.
-   Copy the binary to /opt/cit_k8s_extensions/bin folder
-   
-	mkdir /opt/cit_k8s_extensions
-	mkdir /opt/cit_k8s_extensions/bin
+   Copy the binary to /opt/cit_k8s_extensions/bin folder 
+	
     cp  citk8scontroller-1.0-SNAPSHOT /opt/cit_k8s_extensions/bin/.
 	chmod +x /opt/cit_k8s_extensions/bin/citk8scontroller-1.0-SNAPSHOT
 
@@ -31,7 +29,6 @@ STEPS:
 
 3. Run below commands to enable service daemon
 	systemctl daemon-reload  #(to activate newly added service)
-	systemctl enable citk8scontroller.service
 
 4. Run the custom controller using below command	
 
