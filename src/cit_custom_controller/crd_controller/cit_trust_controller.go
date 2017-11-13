@@ -11,6 +11,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
+	"sync"
 	"strings"
 	"time"
 )
@@ -156,7 +157,7 @@ func GetTlObjLabel(obj trust_schema.HostList) (crd_label_annotate.Labels, crd_la
 }
 
 //AddTrustTabObj Handler for addition event of the TL CRD
-func AddTrustTabObj(trustobj *trust_schema.Trustcrd, helper crd_label_annotate.APIHelpers, cli *k8sclient.Clientset) {
+func AddTrustTabObj(trustobj *trust_schema.Trustcrd, helper crd_label_annotate.APIHelpers, cli *k8sclient.Clientset, mutex *sync.Mutex) {
 	//fmt.Println("cast event name ", trustobj.Name)
 	for index, ele := range trustobj.Spec.HostList {
 		nodeName := trustobj.Spec.HostList[index].Hostname
@@ -166,8 +167,10 @@ func AddTrustTabObj(trustobj *trust_schema.Trustcrd, helper crd_label_annotate.A
 			return
 		}
 		lbl, ann := GetTlObjLabel(ele)
+		mutex.Lock()
 		helper.AddLabelsAnnotations(node, lbl, ann)
 		err = helper.UpdateNode(cli, node)
+		mutex.Unlock()
 		if err != nil {
 			glog.Info("can't update node: %s", err.Error())
 			return
@@ -176,7 +179,7 @@ func AddTrustTabObj(trustobj *trust_schema.Trustcrd, helper crd_label_annotate.A
 }
 
 //NewTLIndexerInformer returns informer for TL CRD object
-func NewTLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInterface) (cache.Indexer, cache.Controller) {
+func NewTLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInterface, crdMutex *sync.Mutex) (cache.Indexer, cache.Controller) {
 	// Create a new clientset which include our CRD schema
 	crdcs, scheme, err := trust_schema.NewTLClient(config)
 	if err != nil {
@@ -197,7 +200,7 @@ func NewTLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInter
 			if err == nil {
 				queue.Add(key)
 			}
-			AddTrustTabObj(trustobj, h_inf, cli)
+			AddTrustTabObj(trustobj, h_inf, cli, crdMutex)
 		},
 		UpdateFunc: func(old interface{}, new interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(new)
@@ -206,7 +209,7 @@ func NewTLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInter
 			if err == nil {
 				queue.Add(key)
 			}
-			AddTrustTabObj(trustobj, h_inf, cli)
+			AddTrustTabObj(trustobj, h_inf, cli, crdMutex)
 		},
 		DeleteFunc: func(obj interface{}) {
 			// IndexerInformer uses a delta queue, therefore for deletes we have to use this

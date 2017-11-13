@@ -8,6 +8,7 @@ import (
 	"cit_custom_controller/crd_controller"
 	"flag"
 	"github.com/golang/glog"
+	"sync"
 	apiextcs "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -38,6 +39,9 @@ func main() {
 		panic(err.Error())
 	}
 
+	//Create mutex to sync operation between the two CRD threads
+	var crdmutex = &sync.Mutex{}
+
 	tlCrdDef := crd_controller.GetTLCrdDef()
 
 	//crd_controller.NewCitCustomResourceDefinition to create TL CRD
@@ -49,7 +53,7 @@ func main() {
 	// Create a queue
 	queue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "citTLcontroller")
 
-	tlindexer, tlinformer := crd_controller.NewTLIndexerInformer(config, queue)
+	tlindexer, tlinformer := crd_controller.NewTLIndexerInformer(config, queue, crdmutex)
 
 	controller := crd_controller.NewCitTLController(queue, tlindexer, tlinformer)
 	stop := make(chan struct{})
@@ -67,7 +71,7 @@ func main() {
 	// Create a queue
 	glQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "citGLcontroller")
 
-	glindexer, glinformer := crd_controller.NewGLIndexerInformer(config, glQueue)
+	glindexer, glinformer := crd_controller.NewGLIndexerInformer(config, glQueue, crdmutex)
 
 	geolocationController := crd_controller.NewCitGLController(glQueue, glindexer, glinformer)
 	stopGl := make(chan struct{})

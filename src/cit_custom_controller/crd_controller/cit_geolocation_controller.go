@@ -12,6 +12,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -132,7 +133,7 @@ func (c *citGLController) runWorker() {
 }
 
 //AddGeoTabObj Handler for addition event of the GL CRD
-func AddGeoTabObj(geoobj *geolocation_schema.Geolocationcrd, helper crd_label_annotate.APIHelpers, cli *k8sclient.Clientset) {
+func AddGeoTabObj(geoobj *geolocation_schema.Geolocationcrd, helper crd_label_annotate.APIHelpers, cli *k8sclient.Clientset, mutex *sync.Mutex) {
 	for index, ele := range geoobj.Spec.HostList {
 		nodeName := geoobj.Spec.HostList[index].Hostname
 		node, err := helper.GetNode(cli, nodeName)
@@ -141,8 +142,10 @@ func AddGeoTabObj(geoobj *geolocation_schema.Geolocationcrd, helper crd_label_an
 			return
 		}
 		lbl, ann := GetGlObjLabel(ele)
+		mutex.Lock()
 		helper.AddLabelsAnnotations(node, lbl, ann)
 		err = helper.UpdateNode(cli, node)
+		mutex.Unlock()
 		if err != nil {
 			glog.Infof("can't update node: %s", err.Error())
 			return
@@ -173,7 +176,7 @@ func GetGlObjLabel(obj geolocation_schema.HostList) (crd_label_annotate.Labels, 
 	return lbl, annotation
 }
 
-func NewGLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInterface) (cache.Indexer, cache.Controller) {
+func NewGLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInterface, crdMutex *sync.Mutex) (cache.Indexer, cache.Controller) {
 	// Create a new clientset which include our CRD schema
 	crdcs, scheme, err := geolocation_schema.NewGLClient(config)
 	if err != nil {
@@ -194,7 +197,7 @@ func NewGLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInter
 			if err == nil {
 				queue.Add(key)
 			}
-			AddGeoTabObj(geoObject, h_inf, cli)
+			AddGeoTabObj(geoObject, h_inf, cli, crdMutex)
 		},
 		UpdateFunc: func(old interface{}, new interface{}) {
 			geoObject := new.(*geolocation_schema.Geolocationcrd)
@@ -203,7 +206,7 @@ func NewGLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInter
 			if err == nil {
 				queue.Add(key)
 			}
-			AddGeoTabObj(geoObject, h_inf, cli)
+			AddGeoTabObj(geoObject, h_inf, cli, crdMutex)
 		},
 		DeleteFunc: func(obj interface{}) {
 			// IndexerInformer uses a delta queue, therefore for deletes we have to use this
