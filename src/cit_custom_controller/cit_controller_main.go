@@ -8,11 +8,11 @@ import (
 	"cit_custom_controller/crd_controller"
 	"flag"
 	"github.com/golang/glog"
-	"sync"
 	apiextcs "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/workqueue"
+	"sync"
 )
 
 // GetClientConfig returns rest config, if path not specified assume in cluster config

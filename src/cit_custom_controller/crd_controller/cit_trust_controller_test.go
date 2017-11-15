@@ -2,6 +2,7 @@ package crd_controller
 
 import (
 	trust_schema "cit_custom_controller/crd_schema/cit_trust_schema"
+	api "k8s.io/client-go/pkg/api/v1"
 	"testing"
 )
 
@@ -27,7 +28,8 @@ func TestGetTlObjLabel(t *testing.T) {
 		TrustTagExpiry:       "12-23-45T123.91.12",
 		TrustTagSignedReport: "495270d6242e2c67e24e22bad49dgdah",
 	}
-	recvlabel, recannotate := GetTlObjLabel(trust_obj)
+	node := &api.Node{}
+	recvlabel, recannotate := GetTlObjLabel(trust_obj, node)
 	if _, ok := recvlabel["trusted"]; ok {
 		t.Logf("Found in TL label Trusted field")
 	} else {
