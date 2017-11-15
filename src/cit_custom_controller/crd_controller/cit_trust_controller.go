@@ -145,12 +145,28 @@ func (c *citTLController) runWorker() {
 }
 
 //GetTlObjLabel creates lables and annotations map based on TL CRD
-func GetTlObjLabel(obj trust_schema.HostList) (crd_label_annotate.Labels, crd_label_annotate.Annotations) {
+func GetTlObjLabel(obj trust_schema.HostList, node *api.Node) (crd_label_annotate.Labels, crd_label_annotate.Annotations) {
 	var lbl = make(crd_label_annotate.Labels, 2)
 	var annotation = make(crd_label_annotate.Annotations, 1)
+	trustPresent := false
+	//Comaring with existing node labels
+	for key, value := range node.Labels {
+		if key == trustlabel {
+			trustPresent = true
+			if value == obj.Trusted {
+				glog.Info("No change in Trustlabel, updating Trustexpiry time only")
+			} else {
+				glog.Info("Updating Complete Trustlabel for the node")
+				lbl[trustlabel] = obj.Trusted
+			}
+		}
+	}
+	if !trustPresent {
+		glog.Info("Trust value was not present on node adding for first time")
+		lbl[trustlabel] = obj.Trusted
+	}
 	expiry := strings.Replace(obj.TrustTagExpiry, ":", ".", -1)
 	lbl[trustexpiry] = expiry
-	lbl[trustlabel] = obj.Trusted
 	annotation[trustsignreport] = obj.TrustTagSignedReport
 
 	return lbl, annotation
@@ -166,7 +182,7 @@ func AddTrustTabObj(trustobj *trust_schema.Trustcrd, helper crd_label_annotate.A
 			glog.Info("Failed to get node within cluster: %s", err.Error())
 			return
 		}
-		lbl, ann := GetTlObjLabel(ele)
+		lbl, ann := GetTlObjLabel(ele, node)
 		mutex.Lock()
 		helper.AddLabelsAnnotations(node, lbl, ann)
 		err = helper.UpdateNode(cli, node)
