@@ -8,10 +8,10 @@ import (
 
 func TestGetTLCrdDef(t *testing.T) {
 	expecTlCrd := CrdDefinition{
-		Plural:   "trustcrds",
-		Singular: "trustcrd",
+		Plural:   "platformcrds",
+		Singular: "platformcrd",
 		Group:    "cit.intel.com",
-		Kind:     "TrustCrd",
+		Kind:     "PlatformCrd",
 	}
 	recvTlCrd := GetTLCrdDef()
 	if expecTlCrd != recvTlCrd {

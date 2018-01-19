@@ -14,9 +14,9 @@ import (
 )
 
 const (
-	CITTLPlural   string = "trustcrds"
-	CITTLSingular string = "trustcrd"
-	CITTLKind     string = "TrustCrd"
+	CITTLPlural   string = "platformcrds"
+	CITTLSingular string = "platformcrd"
+	CITTLKind     string = "PlatformCrd"
 	CITTLGroup    string = "cit.intel.com"
 	CITTLVersion  string = "v1beta1"
 )
