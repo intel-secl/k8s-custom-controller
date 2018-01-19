@@ -13,6 +13,9 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/workqueue"
 	"sync"
+
+	// import additional authentication providers - openid etc
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
 )
 
 // GetClientConfig returns rest config, if path not specified assume in cluster config
