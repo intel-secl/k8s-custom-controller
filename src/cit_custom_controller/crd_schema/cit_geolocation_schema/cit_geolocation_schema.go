@@ -38,7 +38,7 @@ type citglclient struct {
 type Geolocationcrd struct {
 	meta_v1.TypeMeta   `json:",inline"`
 	meta_v1.ObjectMeta `json:"metadata"`
-	Spec               geolocationtabspec `json:"spec"`
+	Spec               geolocationspec `json:"spec"`
 	//Status             geolocationtabstatus `json:"status,omitempty"`
 }
 
@@ -49,7 +49,7 @@ type HostList struct {
 	AssetTagSignedReport string            `json:"signedTrustReport"`
 }
 
-type geolocationtabspec struct {
+type geolocationspec struct {
 	HostList []HostList `json:"hostList"`
 }
 

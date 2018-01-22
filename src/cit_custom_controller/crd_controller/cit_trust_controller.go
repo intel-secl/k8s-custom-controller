@@ -17,31 +17,31 @@ import (
 	"time"
 )
 
-type citTLController struct {
+type citPLController struct {
 	indexer  cache.Indexer
 	informer cache.Controller
 	queue    workqueue.RateLimitingInterface
 }
 
-func NewCitTLController(queue workqueue.RateLimitingInterface, indexer cache.Indexer, informer cache.Controller) *citTLController {
-	return &citTLController{
+func NewCitPLController(queue workqueue.RateLimitingInterface, indexer cache.Indexer, informer cache.Controller) *citPLController {
+	return &citPLController{
 		informer: informer,
 		indexer:  indexer,
 		queue:    queue,
-		//tlObj:    make(map[string]trust_schema.Trusttabspec),
+		//plObj:    make(map[string]trust_schema.Platformspec),
 	}
 }
 
-func GetTLCrdDef() CrdDefinition {
+func GetPLCrdDef() CrdDefinition {
 	return CrdDefinition{
-		Plural:   trust_schema.CITTLPlural,
-		Singular: trust_schema.CITTLSingular,
-		Group:    trust_schema.CITTLGroup,
-		Kind:     trust_schema.CITTLKind,
+		Plural:   trust_schema.CITPLPlural,
+		Singular: trust_schema.CITPLSingular,
+		Group:    trust_schema.CITPLGroup,
+		Kind:     trust_schema.CITPLKind,
 	}
 }
 
-func (c *citTLController) processNextItem() bool {
+func (c *citPLController) processNextItem() bool {
 	// Wait until there is a new item in the working queue
 	key, quit := c.queue.Get()
 	if quit {
@@ -63,16 +63,16 @@ func (c *citTLController) processNextItem() bool {
 	return true
 }
 
-//processTLQueue : can be extended to validate the crd objects are been acted upon
-func (c *citTLController) processTLQueue(key string) error {
-	glog.Infof("processTLQueue for Key %#v ", key)
+//processPLQueue : can be extended to validate the crd objects are been acted upon
+func (c *citPLController) processPLQueue(key string) error {
+	glog.Infof("processPLQueue for Key %#v ", key)
 	return nil
 }
 
 // syncFromQueue is the business logic of the controller. In this controller it simply prints
 // information about the CRD to stdout. In case an error happened, it has to simply return the error.
 // The retry logic should not be part of the business logic.
-func (c *citTLController) syncFromQueue(key string) error {
+func (c *citPLController) syncFromQueue(key string) error {
 	obj, exists, err := c.indexer.GetByKey(key)
 	if err != nil {
 		glog.Errorf("Fetching object with key %s from store failed with %v", key, err)
@@ -81,18 +81,18 @@ func (c *citTLController) syncFromQueue(key string) error {
 
 	if !exists {
 		// Below we will warm up our cache with a CDR, so that we will see a delete for one CRD
-		glog.Infof("TL CRD object %s does not exist anymore\n", key)
+		glog.Infof("PL CRD object %s does not exist anymore\n", key)
 	} else {
 		// Note that you also have to check the uid if you have a local controlled resource, which
 		// is dependent on the actual instance, to detect that a CRD object was recreated with the same name
-		glog.Infof("Sync/Add/Update for TL CRD Object %#v ", obj)
-		c.processTLQueue(key)
+		glog.Infof("Sync/Add/Update for PL CRD Object %#v ", obj)
+		c.processPLQueue(key)
 	}
 	return nil
 }
 
 // handleErr checks if an error happened and makes sure we will retry later.
-func (c *citTLController) handleErr(err error, key interface{}) {
+func (c *citPLController) handleErr(err error, key interface{}) {
 	if err == nil {
 		// Forget about the #AddRateLimited history of the key on every successful synchronization.
 		// This ensures that future processing of updates for this key is not delayed because of
@@ -117,12 +117,12 @@ func (c *citTLController) handleErr(err error, key interface{}) {
 	glog.Infof("Dropping CRD %q out of the queue: %v", key, err)
 }
 
-func (c *citTLController) Run(threadiness int, stopCh chan struct{}) {
+func (c *citPLController) Run(threadiness int, stopCh chan struct{}) {
 	defer runtime.HandleCrash()
 
 	// Let the workers stop when we are done
 	defer c.queue.ShutDown()
-	glog.Info("Starting Trust Tab controller")
+	glog.Info("Starting Platformcrd controller")
 
 	go c.informer.Run(stopCh)
 
@@ -137,16 +137,16 @@ func (c *citTLController) Run(threadiness int, stopCh chan struct{}) {
 	}
 
 	<-stopCh
-	glog.Info("Stopping Trust Tab controller")
+	glog.Info("Stopping Platform controller")
 }
 
-func (c *citTLController) runWorker() {
+func (c *citPLController) runWorker() {
 	for c.processNextItem() {
 	}
 }
 
-//GetTlObjLabel creates lables and annotations map based on TL CRD
-func GetTlObjLabel(obj trust_schema.HostList, node *api.Node) (crd_label_annotate.Labels, crd_label_annotate.Annotations) {
+//GetPlObjLabel creates lables and annotations map based on PL CRD
+func GetPlObjLabel(obj trust_schema.HostList, node *api.Node) (crd_label_annotate.Labels, crd_label_annotate.Annotations) {
 	var lbl = make(crd_label_annotate.Labels, 2)
 	var annotation = make(crd_label_annotate.Annotations, 1)
 	trustPresent := false
@@ -174,7 +174,7 @@ func GetTlObjLabel(obj trust_schema.HostList, node *api.Node) (crd_label_annotat
 }
 
 //AddTrustTabObj Handler for addition event of the TL CRD
-func AddTrustTabObj(trustobj *trust_schema.Trustcrd, helper crd_label_annotate.APIHelpers, cli *k8sclient.Clientset, mutex *sync.Mutex) {
+func AddTrustTabObj(trustobj *trust_schema.Platformcrd, helper crd_label_annotate.APIHelpers, cli *k8sclient.Clientset, mutex *sync.Mutex) {
 	//fmt.Println("cast event name ", trustobj.Name)
 	for index, ele := range trustobj.Spec.HostList {
 		nodeName := trustobj.Spec.HostList[index].Hostname
@@ -183,7 +183,7 @@ func AddTrustTabObj(trustobj *trust_schema.Trustcrd, helper crd_label_annotate.A
 			glog.Info("Failed to get node within cluster: %s", err.Error())
 			return
 		}
-		lbl, ann := GetTlObjLabel(ele, node)
+		lbl, ann := GetPlObjLabel(ele, node)
 		mutex.Lock()
 		helper.AddLabelsAnnotations(node, lbl, ann)
 		err = helper.UpdateNode(cli, node)
@@ -195,25 +195,25 @@ func AddTrustTabObj(trustobj *trust_schema.Trustcrd, helper crd_label_annotate.A
 	}
 }
 
-//NewTLIndexerInformer returns informer for TL CRD object
-func NewTLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInterface, crdMutex *sync.Mutex) (cache.Indexer, cache.Controller) {
+//NewPLIndexerInformer returns informer for PL CRD object
+func NewPLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInterface, crdMutex *sync.Mutex) (cache.Indexer, cache.Controller) {
 	// Create a new clientset which include our CRD schema
-	crdcs, scheme, err := trust_schema.NewTLClient(config)
+	crdcs, scheme, err := trust_schema.NewPLClient(config)
 	if err != nil {
 		panic(err)
 	}
 
 	// Create a CRD client interface
-	tlcrdclient := trust_schema.CitTLClient(crdcs, scheme, "default")
+	plcrdclient := trust_schema.CitPLClient(crdcs, scheme, "default")
 
-	//Create a TL CRD Helper object
+	//Create a PL CRD Helper object
 	h_inf, cli := crd_label_annotate.Getk8sClientHelper(config)
 
-	return cache.NewIndexerInformer(tlcrdclient.NewTLListWatch(), &trust_schema.Trustcrd{}, 0, cache.ResourceEventHandlerFuncs{
+	return cache.NewIndexerInformer(plcrdclient.NewPLListWatch(), &trust_schema.Platformcrd{}, 0, cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(obj)
 			glog.Info("Received Add event for ", key)
-			trustobj := obj.(*trust_schema.Trustcrd)
+			trustobj := obj.(*trust_schema.Platformcrd)
 			if err == nil {
 				queue.Add(key)
 			}
@@ -222,7 +222,7 @@ func NewTLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInter
 		UpdateFunc: func(old interface{}, new interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(new)
 			glog.Info("Received Update event for ", key)
-			trustobj := new.(*trust_schema.Trustcrd)
+			trustobj := new.(*trust_schema.Platformcrd)
 			if err == nil {
 				queue.Add(key)
 			}

@@ -45,20 +45,20 @@ func main() {
 	//Create mutex to sync operation between the two CRD threads
 	var crdmutex = &sync.Mutex{}
 
-	tlCrdDef := crd_controller.GetTLCrdDef()
+	plCrdDef := crd_controller.GetPLCrdDef()
 
-	//crd_controller.NewCitCustomResourceDefinition to create TL CRD
-	err = crd_controller.NewCitCustomResourceDefinition(cs, &tlCrdDef)
+	//crd_controller.NewCitCustomResourceDefinition to create PL CRD
+	err = crd_controller.NewCitCustomResourceDefinition(cs, &plCrdDef)
 	if err != nil {
 		panic(err)
 	}
 
 	// Create a queue
-	queue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "citTLcontroller")
+	queue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "citPLcontroller")
 
-	tlindexer, tlinformer := crd_controller.NewTLIndexerInformer(config, queue, crdmutex)
+	plindexer, plinformer := crd_controller.NewPLIndexerInformer(config, queue, crdmutex)
 
-	controller := crd_controller.NewCitTLController(queue, tlindexer, tlinformer)
+	controller := crd_controller.NewCitPLController(queue, plindexer, plinformer)
 	stop := make(chan struct{})
 	defer close(stop)
 	go controller.Run(1, stop)
