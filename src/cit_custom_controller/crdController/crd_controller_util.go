@@ -1,4 +1,4 @@
-package crd_controller
+package crdController
 
 import (
 	"github.com/golang/glog"

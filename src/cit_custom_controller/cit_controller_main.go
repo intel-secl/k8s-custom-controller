@@ -5,7 +5,7 @@ Copyright 2017
 package main
 
 import (
-	"cit_custom_controller/crd_controller"
+	"cit_custom_controller/crdController"
 	"flag"
 	"github.com/golang/glog"
 	apiextcs "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
@@ -45,10 +45,10 @@ func main() {
 	//Create mutex to sync operation between the two CRD threads
 	var crdmutex = &sync.Mutex{}
 
-	plCrdDef := crd_controller.GetPLCrdDef()
+	plCrdDef := crdController.GetPLCrdDef()
 
-	//crd_controller.NewCitCustomResourceDefinition to create PL CRD
-	err = crd_controller.NewCitCustomResourceDefinition(cs, &plCrdDef)
+	//crdController.NewCitCustomResourceDefinition to create PL CRD
+	err = crdController.NewCitCustomResourceDefinition(cs, &plCrdDef)
 	if err != nil {
 		panic(err)
 	}
@@ -56,17 +56,17 @@ func main() {
 	// Create a queue
 	queue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "citPLcontroller")
 
-	plindexer, plinformer := crd_controller.NewPLIndexerInformer(config, queue, crdmutex)
+	plindexer, plinformer := crdController.NewPLIndexerInformer(config, queue, crdmutex)
 
-	controller := crd_controller.NewCitPLController(queue, plindexer, plinformer)
+	controller := crdController.NewCitPLController(queue, plindexer, plinformer)
 	stop := make(chan struct{})
 	defer close(stop)
 	go controller.Run(1, stop)
 
-	glCrdDef := crd_controller.GetGLCrdDef()
+	glCrdDef := crdController.GetGLCrdDef()
 
 	// note: if the CRD exist our CreateCRD function is set to exit without an error
-	err = crd_controller.NewCitCustomResourceDefinition(cs, &glCrdDef)
+	err = crdController.NewCitCustomResourceDefinition(cs, &glCrdDef)
 	if err != nil {
 		panic(err)
 	}
@@ -74,9 +74,9 @@ func main() {
 	// Create a queue
 	glQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "citGLcontroller")
 
-	glindexer, glinformer := crd_controller.NewGLIndexerInformer(config, glQueue, crdmutex)
+	glindexer, glinformer := crdController.NewGLIndexerInformer(config, glQueue, crdmutex)
 
-	geolocationController := crd_controller.NewCitGLController(glQueue, glindexer, glinformer)
+	geolocationController := crdController.NewCitGLController(glQueue, glindexer, glinformer)
 	stopGl := make(chan struct{})
 	defer close(stopGl)
 	go geolocationController.Run(1, stopGl)

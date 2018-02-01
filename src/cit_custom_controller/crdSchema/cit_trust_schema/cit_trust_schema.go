@@ -1,6 +1,3 @@
-/*
-Copyright 2017
-*/
 package crd_trust_schema
 
 import (

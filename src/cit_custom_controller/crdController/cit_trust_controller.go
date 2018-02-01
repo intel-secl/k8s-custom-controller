@@ -1,8 +1,8 @@
-package crd_controller
+package crdController
 
 import (
-	"cit_custom_controller/crd_label_annotate"
-	trust_schema "cit_custom_controller/crd_schema/cit_trust_schema"
+	"cit_custom_controller/crdLabelAnnotate"
+	trust_schema "cit_custom_controller/crdSchema/cit_trust_schema"
 	"fmt"
 	"github.com/golang/glog"
 	"k8s.io/apimachinery/pkg/util/runtime"
@@ -146,9 +146,9 @@ func (c *citPLController) runWorker() {
 }
 
 //GetPlObjLabel creates lables and annotations map based on PL CRD
-func GetPlObjLabel(obj trust_schema.HostList, node *api.Node) (crd_label_annotate.Labels, crd_label_annotate.Annotations) {
-	var lbl = make(crd_label_annotate.Labels, 2)
-	var annotation = make(crd_label_annotate.Annotations, 1)
+func GetPlObjLabel(obj trust_schema.HostList, node *api.Node) (crdLabelAnnotate.Labels, crdLabelAnnotate.Annotations) {
+	var lbl = make(crdLabelAnnotate.Labels, 2)
+	var annotation = make(crdLabelAnnotate.Annotations, 1)
 	trustPresent := false
 	//Comaring with existing node labels
 	for key, value := range node.Labels {
@@ -174,7 +174,7 @@ func GetPlObjLabel(obj trust_schema.HostList, node *api.Node) (crd_label_annotat
 }
 
 //AddTrustTabObj Handler for addition event of the TL CRD
-func AddTrustTabObj(trustobj *trust_schema.Platformcrd, helper crd_label_annotate.APIHelpers, cli *k8sclient.Clientset, mutex *sync.Mutex) {
+func AddTrustTabObj(trustobj *trust_schema.Platformcrd, helper crdLabelAnnotate.APIHelpers, cli *k8sclient.Clientset, mutex *sync.Mutex) {
 	//fmt.Println("cast event name ", trustobj.Name)
 	for index, ele := range trustobj.Spec.HostList {
 		nodeName := trustobj.Spec.HostList[index].Hostname
@@ -207,7 +207,7 @@ func NewPLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInter
 	plcrdclient := trust_schema.CitPLClient(crdcs, scheme, "default")
 
 	//Create a PL CRD Helper object
-	h_inf, cli := crd_label_annotate.Getk8sClientHelper(config)
+	hInf, cli := crdLabelAnnotate.Getk8sClientHelper(config)
 
 	return cache.NewIndexerInformer(plcrdclient.NewPLListWatch(), &trust_schema.Platformcrd{}, 0, cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
@@ -217,7 +217,7 @@ func NewPLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInter
 			if err == nil {
 				queue.Add(key)
 			}
-			AddTrustTabObj(trustobj, h_inf, cli, crdMutex)
+			AddTrustTabObj(trustobj, hInf, cli, crdMutex)
 		},
 		UpdateFunc: func(old interface{}, new interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(new)
@@ -226,7 +226,7 @@ func NewPLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInter
 			if err == nil {
 				queue.Add(key)
 			}
-			AddTrustTabObj(trustobj, h_inf, cli, crdMutex)
+			AddTrustTabObj(trustobj, hInf, cli, crdMutex)
 		},
 		DeleteFunc: func(obj interface{}) {
 			// IndexerInformer uses a delta queue, therefore for deletes we have to use this

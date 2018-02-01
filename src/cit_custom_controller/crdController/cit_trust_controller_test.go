@@ -1,7 +1,7 @@
-package crd_controller
+package crdController
 
 import (
-	trust_schema "cit_custom_controller/crd_schema/cit_trust_schema"
+	trust_schema "cit_custom_controller/crdSchema/cit_trust_schema"
 	api "k8s.io/client-go/pkg/api/v1"
 	"testing"
 )
@@ -22,14 +22,14 @@ func TestGetPLCrdDef(t *testing.T) {
 }
 
 func TestGetPlObjLabel(t *testing.T) {
-	trust_obj := trust_schema.HostList{
+	trustObj := trust_schema.HostList{
 		Hostname:             "Node123",
 		Trusted:              "true",
 		TrustTagExpiry:       "12-23-45T123.91.12",
 		TrustTagSignedReport: "495270d6242e2c67e24e22bad49dgdah",
 	}
 	node := &api.Node{}
-	recvlabel, recannotate := GetPlObjLabel(trust_obj, node)
+	recvlabel, recannotate := GetPlObjLabel(trustObj, node)
 	if _, ok := recvlabel["trusted"]; ok {
 		t.Logf("Found in PL label Trusted field")
 	} else {

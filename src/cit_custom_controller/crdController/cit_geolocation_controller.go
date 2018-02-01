@@ -1,8 +1,8 @@
-package crd_controller
+package crdController
 
 import (
-	"cit_custom_controller/crd_label_annotate"
-	geolocation_schema "cit_custom_controller/crd_schema/cit_geolocation_schema"
+	"cit_custom_controller/crdLabelAnnotate"
+	geolocation_schema "cit_custom_controller/crdSchema/cit_geolocation_schema"
 	"fmt"
 	"github.com/golang/glog"
 	"k8s.io/apimachinery/pkg/util/runtime"
@@ -133,7 +133,7 @@ func (c *citGLController) runWorker() {
 }
 
 //AddGeoTabObj Handler for addition event of the GL CRD
-func AddGeoTabObj(geoobj *geolocation_schema.Geolocationcrd, helper crd_label_annotate.APIHelpers, cli *k8sclient.Clientset, mutex *sync.Mutex) {
+func AddGeoTabObj(geoobj *geolocation_schema.Geolocationcrd, helper crdLabelAnnotate.APIHelpers, cli *k8sclient.Clientset, mutex *sync.Mutex) {
 	for index, ele := range geoobj.Spec.HostList {
 		nodeName := geoobj.Spec.HostList[index].Hostname
 		node, err := helper.GetNode(cli, nodeName)
@@ -148,16 +148,16 @@ func AddGeoTabObj(geoobj *geolocation_schema.Geolocationcrd, helper crd_label_an
 		mutex.Unlock()
 		if err != nil {
 			glog.Infof("can't update node: %s", err.Error())
-			return
+			//return
 		}
 	}
 }
 
 //getGlAssettag creates lables map based on asset tag field of GL CRD
-func getGlAssettag(obj geolocation_schema.HostList) crd_label_annotate.Labels {
+func getGlAssettag(obj geolocation_schema.HostList) crdLabelAnnotate.Labels {
 	size := len(obj.Assettag)
 	//fmt.Printf("Number of keys in AssetTag: %d \n", size)
-	var lbl = make(crd_label_annotate.Labels, size+1)
+	var lbl = make(crdLabelAnnotate.Labels, size+1)
 	for key, val := range obj.Assettag {
 		labelkey := strings.Replace(key, " ", ".", -1)
 		labelkey = strings.Replace(labelkey, ":", ".", -1)
@@ -167,8 +167,8 @@ func getGlAssettag(obj geolocation_schema.HostList) crd_label_annotate.Labels {
 }
 
 //GetGlObjLabel creates lables and annotations map based on GL CRD
-func GetGlObjLabel(obj geolocation_schema.HostList) (crd_label_annotate.Labels, crd_label_annotate.Annotations) {
-	var annotation = make(crd_label_annotate.Annotations, 1)
+func GetGlObjLabel(obj geolocation_schema.HostList) (crdLabelAnnotate.Labels, crdLabelAnnotate.Annotations) {
+	var annotation = make(crdLabelAnnotate.Annotations, 1)
 	lbl := getGlAssettag(obj)
 	assetexpiryval := strings.Replace(obj.AssetTagExpiry, ":", ".", -1)
 	lbl[assetexpiry] = assetexpiryval
@@ -187,7 +187,7 @@ func NewGLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInter
 	glcrdclient := geolocation_schema.CitGLClient(crdcs, scheme, "default")
 
 	//Create a GL CRD Helper object
-	h_inf, cli := crd_label_annotate.Getk8sClientHelper(config)
+	hInf, cli := crdLabelAnnotate.Getk8sClientHelper(config)
 
 	return cache.NewIndexerInformer(glcrdclient.NewGLListWatch(), &geolocation_schema.Geolocationcrd{}, 0, cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
@@ -197,7 +197,7 @@ func NewGLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInter
 			if err == nil {
 				queue.Add(key)
 			}
-			AddGeoTabObj(geoObject, h_inf, cli, crdMutex)
+			AddGeoTabObj(geoObject, hInf, cli, crdMutex)
 		},
 		UpdateFunc: func(old interface{}, new interface{}) {
 			geoObject := new.(*geolocation_schema.Geolocationcrd)
@@ -206,7 +206,7 @@ func NewGLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInter
 			if err == nil {
 				queue.Add(key)
 			}
-			AddGeoTabObj(geoObject, h_inf, cli, crdMutex)
+			AddGeoTabObj(geoObject, hInf, cli, crdMutex)
 		},
 		DeleteFunc: func(obj interface{}) {
 			// IndexerInformer uses a delta queue, therefore for deletes we have to use this

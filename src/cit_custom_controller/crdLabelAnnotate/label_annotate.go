@@ -1,7 +1,4 @@
-/*
-Copyright 2017
-*/
-package crd_label_annotate
+package crdLabelAnnotate
 
 import (
 	"github.com/golang/glog"

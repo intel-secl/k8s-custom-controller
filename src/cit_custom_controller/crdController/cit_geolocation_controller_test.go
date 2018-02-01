@@ -1,7 +1,7 @@
-package crd_controller
+package crdController
 
 import (
-	geo_schema "cit_custom_controller/crd_schema/cit_geolocation_schema"
+	geo_schema "cit_custom_controller/crdSchema/cit_geolocation_schema"
 	"testing"
 )
 
@@ -21,7 +21,7 @@ func TestGetGLCrdDef(t *testing.T) {
 }
 
 func TestGetGlObjLabel(t *testing.T) {
-	geo_obj := geo_schema.HostList{
+	geoObj := geo_schema.HostList{
 		Hostname:             "Node123",
 		AssetTagExpiry:       "12-23-45T123.91.12",
 		AssetTagSignedReport: "295270d6242e2c67e24e22bad49dtera",
@@ -32,7 +32,7 @@ func TestGetGlObjLabel(t *testing.T) {
 			"city.seatle": "true",
 		},
 	}
-	recvlabel, recannotate := GetGlObjLabel(geo_obj)
+	recvlabel, recannotate := GetGlObjLabel(geoObj)
 	if _, ok := recvlabel["country.us"]; ok {
 		t.Logf("Found GL label in AssetTag report")
 	} else {
