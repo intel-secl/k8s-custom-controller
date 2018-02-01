@@ -2,7 +2,7 @@ package crdController
 
 import (
 	"cit_custom_controller/crdLabelAnnotate"
-	trust_schema "cit_custom_controller/crdSchema/cit_trust_schema"
+	trust_schema "cit_custom_controller/crdSchema/citTrustSchema"
 	"fmt"
 	"github.com/golang/glog"
 	"k8s.io/apimachinery/pkg/util/runtime"

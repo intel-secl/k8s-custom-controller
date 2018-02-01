@@ -2,7 +2,7 @@ package crdController
 
 import (
 	"cit_custom_controller/crdLabelAnnotate"
-	geolocation_schema "cit_custom_controller/crdSchema/cit_geolocation_schema"
+	geolocation_schema "cit_custom_controller/crdSchema/citGeolocationSchema"
 	"fmt"
 	"github.com/golang/glog"
 	"k8s.io/apimachinery/pkg/util/runtime"

@@ -1,7 +1,7 @@
 package crdController
 
 import (
-	geo_schema "cit_custom_controller/crdSchema/cit_geolocation_schema"
+	geo_schema "cit_custom_controller/crdSchema/citGeolocationSchema"
 	"testing"
 )
 

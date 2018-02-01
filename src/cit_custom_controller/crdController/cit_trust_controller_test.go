@@ -1,7 +1,7 @@
 package crdController
 
 import (
-	trust_schema "cit_custom_controller/crdSchema/cit_trust_schema"
+	trust_schema "cit_custom_controller/crdSchema/citTrustSchema"
 	api "k8s.io/client-go/pkg/api/v1"
 	"testing"
 )
