@@ -1,4 +1,4 @@
-package crd_trust_schema
+package crdTrustSchema
 
 import (
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
