@@ -29,9 +29,15 @@ func GetClientConfig(kubeconfig string) (*rest.Config, error) {
 func main() {
 
 	glog.V(4).Infof("Starting Cit Custom Controller")
-	kubeconf := flag.String("kubeconf", "", "Path to a kube config. Only required if out-of-cluster.")
+	
+	
+	kubeConf := flag.String("kubeconf", "", "Path to a kube config. Only required if out-of-cluster.")
 	flag.Parse()
-
+	if len(*kubeconf) > 256 {
+			panic(fmt.Sprintf("kubeconf path error"))
+    }
+	
+			
 	config, err := GetClientConfig(*kubeconf)
 	if err != nil {
 		panic(err.Error())
