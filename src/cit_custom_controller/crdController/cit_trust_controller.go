@@ -7,8 +7,10 @@ package crdController
 import (
 	"cit_custom_controller/crdLabelAnnotate"
 	trust_schema "cit_custom_controller/crdSchema/citTrustSchema"
+	"encoding/json"
 	"fmt"
 	"github.com/golang/glog"
+	"io/ioutil"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	k8sclient "k8s.io/client-go/kubernetes"
@@ -19,6 +21,10 @@ import (
 	"strings"
 	"sync"
 	"time"
+)
+
+const (
+	CONFPATH string = "/opt/cit_k8s_extensions/bin/tag_prefix.conf"
 )
 
 type citPLController struct {
@@ -154,27 +160,45 @@ func GetPlObjLabel(obj trust_schema.HostList, node *api.Node) (crdLabelAnnotate.
 	var lbl = make(crdLabelAnnotate.Labels, 2)
 	var annotation = make(crdLabelAnnotate.Annotations, 1)
 	trustPresent := false
-	//Comaring with existing node labels
+	trustLabelWithPrefix := getPrefixFromConf(CONFPATH) + trustlabel
+	//Comparing with existing node labels
 	for key, value := range node.Labels {
-		if key == trustlabel {
+		if key == trustLabelWithPrefix {
 			trustPresent = true
 			if value == obj.Trusted {
 				glog.Info("No change in Trustlabel, updating Trustexpiry time only")
 			} else {
 				glog.Info("Updating Complete Trustlabel for the node")
-				lbl[trustlabel] = obj.Trusted
+				lbl[trustLabelWithPrefix] = obj.Trusted
 			}
 		}
 	}
 	if !trustPresent {
 		glog.Info("Trust value was not present on node adding for first time")
-		lbl[trustlabel] = obj.Trusted
+		lbl[trustLabelWithPrefix] = obj.Trusted
 	}
 	expiry := strings.Replace(obj.TrustTagExpiry, ":", ".", -1)
 	lbl[trustexpiry] = expiry
 	annotation[trustsignreport] = obj.TrustTagSignedReport
 
 	return lbl, annotation
+}
+
+type Config struct {
+	Trusted string `"json":"trustedPrefix"`
+}
+
+func getPrefixFromConf(path string) string {
+	out, err := ioutil.ReadFile(path)
+	if err != nil {
+		fmt.Println(err)
+	}
+	s := Config{}
+	err = json.Unmarshal(out, &s)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return s.Trusted
 }
 
 //AddTrustTabObj Handler for addition event of the TL CRD

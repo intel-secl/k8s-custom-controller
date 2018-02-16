@@ -33,8 +33,9 @@ func TestGetPlObjLabel(t *testing.T) {
 		TrustTagSignedReport: "495270d6242e2c67e24e22bad49dgdah",
 	}
 	node := &api.Node{}
+	path := "/opt/cit_k8s_extensions/bin/anjum.conf"
 	recvlabel, recannotate := GetPlObjLabel(trustObj, node)
-	if _, ok := recvlabel["trusted"]; ok {
+	if _, ok := recvlabel[getPrefixFromConf(path)+"trusted"]; ok {
 		t.Logf("Found in PL label Trusted field")
 	} else {
 		t.Fatalf("Could not get label trusted from PL Report")

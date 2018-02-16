@@ -24,21 +24,27 @@ STEPS:
     cp  citk8scontroller-1.0-SNAPSHOT /opt/cit_k8s_extensions/bin/.
 	chmod +x /opt/cit_k8s_extensions/bin/citk8scontroller-1.0-SNAPSHOT
 
-2. Place below systemd service file in /etc/systemd/system/ folder (available in the same directory as this README)
+2. Create tag_prefix.conf file in /opt/cit_k8s_extensions/bin/ of k8s master machine with below json.
+
+	{
+		"trusted":<<prefix for trust tag>>
+	}
+
+3. Place below systemd service file in /etc/systemd/system/ folder (available in the same directory as this README)
 		citk8scontroller.service
 
-3. Run below commands to enable service daemon
+4. Run below commands to enable service daemon
 	systemctl daemon-reload  #(to activate newly added service)
 
-4. Run the custom controller using below command	
+5. Run the custom controller using below command	
 
 	systemctl start citk8scontroller.service
 
-5. To check status of this service run below command
+6. To check status of this service run below command
 	
 	systemctl status citk8scontroller.service
 
-6. To stop this service run below command
+7. To stop this service run below command
 	
 	systemctl stop citk8scontroller.service
 
