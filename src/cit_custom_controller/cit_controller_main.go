@@ -12,11 +12,11 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/workqueue"
+	"os"
 	"sync"
-
-	// import additional authentication providers - openid etc
-	_ "k8s.io/client-go/plugin/pkg/client/auth"
 )
+
+const MAXFILESIZE int64 = (256 * 1024 * 1024)
 
 // GetClientConfig returns rest config, if path not specified assume in cluster config
 func GetClientConfig(kubeconfig string) (*rest.Config, error) {
@@ -29,16 +29,19 @@ func GetClientConfig(kubeconfig string) (*rest.Config, error) {
 func main() {
 
 	glog.V(4).Infof("Starting Cit Custom Controller")
-	
-	
+
 	kubeConf := flag.String("kubeconf", "", "Path to a kube config. Only required if out-of-cluster.")
 	flag.Parse()
-	if len(*kubeconf) > 256 {
-			panic(fmt.Sprintf("kubeconf path error"))
-    }
-	
-			
-	config, err := GetClientConfig(*kubeconf)
+
+	if fi, e := os.Stat(*kubeConf); e == nil {
+		// get the size
+		size := fi.Size()
+		if size > MAXFILESIZE {
+			panic(e.Error())
+		}
+	}
+
+	config, err := GetClientConfig(*kubeConf)
 	if err != nil {
 		panic(err.Error())
 	}
