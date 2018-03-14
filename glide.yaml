@@ -1,0 +1,29 @@
+package: k8s_custom_cit_controllers-k8s_custom_controllers
+import:
+- package: github.com/golang/glog
+- package: github.com/mailru/easyjson/jlexer
+- package: k8s.io/apiextensions-apiserver
+  revision: "be41f5093e2b05c7a0befe35b04b715eb325ab43"
+  subpackages:
+  - pkg/apis/apiextensions/v1beta1
+  - pkg/client/clientset/clientset
+- package: k8s.io/apimachinery
+  revision: "1fd2e63a9a370677308a42f24fd40c86438afddf"
+  subpackages:
+  - pkg/api/errors
+  - pkg/apis/meta/v1
+  - pkg/fields
+  - pkg/runtime
+  - pkg/runtime/schema
+  - pkg/runtime/serializer
+  - pkg/util/runtime
+  - pkg/util/wait
+- package: k8s.io/client-go
+  version: 4.0.0
+  subpackages:
+  - kubernetes
+  - pkg/api/v1
+  - rest
+  - tools/cache
+  - tools/clientcmd
+  - util/workqueue

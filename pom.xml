@@ -72,7 +72,7 @@
             <id>default-build</id>
             <configuration>
               <packages>
-                <main>cit_custom_controller/cit_controller_main.go</main>
+                <main>cit_controller_main.go</main>
               </packages>
             </configuration>
           </execution>
@@ -84,7 +84,7 @@
             </goals>
             <configuration>
               <packages>
-                <app>cit_custom_controller/cit_controller_main.go</app>
+                <app>cit_controller_main.go</app>
               </packages>
             </configuration>
           </execution>
