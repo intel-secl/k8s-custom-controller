@@ -6,7 +6,7 @@ DESCRIPTION="CIT K8S Docker Container Integrity Plugin"
 SERVICE=citk8s-custom-controller
 SYSTEMINSTALLDIR=/opt/citk8s/$(SERVICE)
 
-VERSION := 1.0.0
+VERSION := 1.0-SNAPSHOT
 BUILD := `date +%FT%T%z`
 
 # LDFLAGS
@@ -17,7 +17,7 @@ LDFLAGS=-ldflags "-X main.Version=${VERSION} -X main.Build=${BUILD}"
 .DEFAULT_GOAL: $(SERVICE)
 $(SERVICE):
 	glide update -v
-	go build ${LDFLAGS} -o ${SERVICE} ${SOURCES}
+	go build ${LDFLAGS} -o ${SERVICE}-${VERSION} ${SOURCES}
 
 # Install the service binary and the service config files
 .PHONY: install
@@ -33,4 +33,4 @@ uninstall:
 .PHONY: clean
 clean:
 	@rm -rf vendor/
-	@rm -f ${SERVICE}
+	@rm -f ${SERVICE}-${VERSION}
