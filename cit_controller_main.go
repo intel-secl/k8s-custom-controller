@@ -31,15 +31,9 @@ func main() {
 	glog.V(4).Infof("Starting Cit Custom Controller")
 
 	kubeConf := flag.String("kubeconf", "", "Path to a kube config. Only required if out-of-cluster.")
+	trustedPrefixConf := flag.String("trustedprefixconf", "", "Path to a Trusted Prefix config. Only required if out-of-cluster.")
 	flag.Parse()
 
-	if fi, e := os.Stat(*kubeConf); e == nil {
-		// get the size
-		size := fi.Size()
-		if size > MAXFILESIZE {
-			panic(e.Error())
-		}
-	}
 
 	config, err := GetClientConfig(*kubeConf)
 	if err != nil {
@@ -65,7 +59,7 @@ func main() {
 	// Create a queue
 	queue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "citPLcontroller")
 
-	plindexer, plinformer := crdController.NewPLIndexerInformer(config, queue, crdmutex)
+	plindexer, plinformer := crdController.NewPLIndexerInformer(config, queue, crdmutex,*trustedPrefixConf)
 
 	controller := crdController.NewCitPLController(queue, plindexer, plinformer)
 	stop := make(chan struct{})

@@ -224,7 +224,7 @@ func AddTrustTabObj(trustobj *trust_schema.Platformcrd, helper crdLabelAnnotate.
 }
 
 //NewPLIndexerInformer returns informer for PL CRD object
-func NewPLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInterface, crdMutex *sync.Mutex) (cache.Indexer, cache.Controller) {
+func NewPLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInterface, crdMutex *sync.Mutex,trustedPrefixConf string) (cache.Indexer, cache.Controller) {
 	// Create a new clientset which include our CRD schema
 	crdcs, scheme, err := trust_schema.NewPLClient(config)
 	if err != nil {
@@ -245,7 +245,7 @@ func NewPLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInter
 			if err == nil {
 				queue.Add(key)
 			}
-			AddTrustTabObj(trustobj, hInf, cli, crdMutex)
+			AddTrustTabObj(trustobj, hInf, cli, crdMutex,trustedPrefixConf)
 		},
 		UpdateFunc: func(old interface{}, new interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(new)
@@ -254,7 +254,7 @@ func NewPLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInter
 			if err == nil {
 				queue.Add(key)
 			}
-			AddTrustTabObj(trustobj, hInf, cli, crdMutex)
+			AddTrustTabObj(trustobj, hInf, cli, crdMutex,trustedPrefixConf)
 		},
 		DeleteFunc: func(obj interface{}) {
 			// IndexerInformer uses a delta queue, therefore for deletes we have to use this
