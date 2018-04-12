@@ -5,15 +5,17 @@ SPDX-License-Identifier: BSD-3-Clause
 package main
 
 import (
-	"cit_custom_controller/crdController"
-	"flag"
-	"github.com/golang/glog"
-	apiextcs "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/client-go/util/workqueue"
-	"sync"
+        "k8s_custom_cit_controllers-k8s_custom_controllers/crdController"
+        "flag"
+        "github.com/golang/glog"
+        apiextcs "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
+        "k8s.io/client-go/rest"
+        "k8s.io/client-go/tools/clientcmd"
+        "k8s.io/client-go/util/workqueue"
+        "os"
+        "sync"
 )
+
 
 const MAXFILESIZE int64 = (256 * 1024 * 1024)
 

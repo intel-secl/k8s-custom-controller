@@ -5,7 +5,7 @@ SPDX-License-Identifier: BSD-3-Clause
 package crdController
 
 import (
-	trust_schema "cit_custom_controller/crdSchema/citTrustSchema"
+	trust_schema "k8s_custom_cit_controllers-k8s_custom_controllers/crdSchema/citTrustSchema"
 	api "k8s.io/client-go/pkg/api/v1"
 	"testing"
 )

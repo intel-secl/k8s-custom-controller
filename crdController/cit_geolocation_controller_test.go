@@ -5,7 +5,7 @@ SPDX-License-Identifier: BSD-3-Clause
 package crdController
 
 import (
-	geo_schema "cit_custom_controller/crdSchema/citGeolocationSchema"
+	geo_schema "k8s_custom_cit_controllers-k8s_custom_controllers/crdSchema/citGeolocationSchema"
 	"testing"
 )
 

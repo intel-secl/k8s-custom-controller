@@ -5,19 +5,19 @@ SPDX-License-Identifier: BSD-3-Clause
 package crdController
 
 import (
-	"cit_custom_controller/crdLabelAnnotate"
-	geolocation_schema "cit_custom_controller/crdSchema/citGeolocationSchema"
-	"fmt"
-	"github.com/golang/glog"
-	"k8s.io/apimachinery/pkg/util/runtime"
-	"k8s.io/apimachinery/pkg/util/wait"
-	k8sclient "k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/cache"
-	"k8s.io/client-go/util/workqueue"
-	"strings"
-	"sync"
-	"time"
+        "k8s_custom_cit_controllers-k8s_custom_controllers/crdLabelAnnotate"
+        geolocation_schema "k8s_custom_cit_controllers-k8s_custom_controllers/crdSchema/citGeolocationSchema"
+        "fmt"
+        "github.com/golang/glog"
+        "k8s.io/apimachinery/pkg/util/runtime"
+        "k8s.io/apimachinery/pkg/util/wait"
+        k8sclient "k8s.io/client-go/kubernetes"
+        "k8s.io/client-go/rest"
+        "k8s.io/client-go/tools/cache"
+        "k8s.io/client-go/util/workqueue"
+        "strings"
+        "sync"
+        "time"
 )
 
 type citGLController struct {

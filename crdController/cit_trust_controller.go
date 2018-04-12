@@ -5,22 +5,22 @@ SPDX-License-Identifier: BSD-3-Clause
 package crdController
 
 import (
-	"cit_custom_controller/crdLabelAnnotate"
-	trust_schema "cit_custom_controller/crdSchema/citTrustSchema"
-	"encoding/json"
-	"fmt"
-	"github.com/golang/glog"
-	"io/ioutil"
-	"k8s.io/apimachinery/pkg/util/runtime"
-	"k8s.io/apimachinery/pkg/util/wait"
-	k8sclient "k8s.io/client-go/kubernetes"
-	api "k8s.io/client-go/pkg/api/v1"
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/cache"
-	"k8s.io/client-go/util/workqueue"
-	"strings"
-	"sync"
-	"time"
+        "k8s_custom_cit_controllers-k8s_custom_controllers/crdLabelAnnotate"
+        trust_schema "k8s_custom_cit_controllers-k8s_custom_controllers/crdSchema/citTrustSchema"
+        "encoding/json"
+        "fmt"
+        "github.com/golang/glog"
+        "io/ioutil"
+        "k8s.io/apimachinery/pkg/util/runtime"
+        "k8s.io/apimachinery/pkg/util/wait"
+        k8sclient "k8s.io/client-go/kubernetes"
+        api "k8s.io/client-go/pkg/api/v1"
+        "k8s.io/client-go/rest"
+        "k8s.io/client-go/tools/cache"
+        "k8s.io/client-go/util/workqueue"
+        "strings"
+        "sync"
+        "time"
 )
 
 type citPLController struct {
