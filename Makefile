@@ -1,10 +1,12 @@
-# CIT K8S Docker Container Integrity Plugin
-# Builds, Installs and Uninstalls the image authorization plugin service
-# Author: Manu Ullas <manux.ullas@intel.com>
-DESCRIPTION="CIT K8S Docker Container Integrity Plugin"
+# CIT K8S Custom Controller
+# Applies labels as per Custom Resource Definitions
+# Author:  <manux.ullas@intel.com>
+DESCRIPTION="CIT K8S Custom Controller"
 
-SERVICE=citk8s-custom-controller
-SYSTEMINSTALLDIR=/opt/citk8s/$(SERVICE)
+SERVICE=citk8scontroller
+SYSTEMINSTALLDIR=/opt/cit_k8s_extensions/bin/
+SERVICEINSTALLDIR=/etc/systemd/system/
+SERVICECONFIG=${SERVICE}.service
 
 VERSION := 1.0-SNAPSHOT
 BUILD := `date +%FT%T%z`
@@ -22,12 +24,16 @@ $(SERVICE):
 # Install the service binary and the service config files
 .PHONY: install
 install:
-	@cp -f ${SERVICE} ${SERVICEINSTALLDIR}
+	@service citk8scontroller stop
+	@cp -f ${SERVICE}-${VERSION} ${SYSTEMINSTALLDIR}
+	@cp -f ${SERVICECONFIG} ${SERVICEINSTALLDIR}
+	@systemctl daemon-reload
+	@service citk8scontroller start
 
 # Uninstalls the service binary and the service config files
 .PHONY: uninstall
 uninstall:
-	@rm -f ${SERVICEINSTALLDIR}/${SERVICE}
+	@service citk8scontroller stop && rm -f ${SERVICEINSTALLDIR}/${SERVICE} ${SERVICEINSTALLDIR}/${SERVICECONFIG}
 
 # Removes the generated service config and binary files
 .PHONY: clean
