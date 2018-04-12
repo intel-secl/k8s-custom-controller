@@ -156,11 +156,11 @@ func (c *citPLController) runWorker() {
 }
 
 //GetPlObjLabel creates lables and annotations map based on PL CRD
-func GetPlObjLabel(obj trust_schema.HostList, node *api.Node) (crdLabelAnnotate.Labels, crdLabelAnnotate.Annotations) {
+func GetPlObjLabel(obj trust_schema.HostList, node *api.Node,trustedPrefixConf string) (crdLabelAnnotate.Labels, crdLabelAnnotate.Annotations) {
 	var lbl = make(crdLabelAnnotate.Labels, 2)
 	var annotation = make(crdLabelAnnotate.Annotations, 1)
 	trustPresent := false
-	trustLabelWithPrefix := getPrefixFromConf(CONFPATH) + trustlabel
+	trustLabelWithPrefix := getPrefixFromConf(trustedPrefixConf) + trustlabel
 	//Comparing with existing node labels
 	for key, value := range node.Labels {
 		if key == trustLabelWithPrefix {
@@ -202,7 +202,7 @@ func getPrefixFromConf(path string) string {
 }
 
 //AddTrustTabObj Handler for addition event of the TL CRD
-func AddTrustTabObj(trustobj *trust_schema.Platformcrd, helper crdLabelAnnotate.APIHelpers, cli *k8sclient.Clientset, mutex *sync.Mutex) {
+func AddTrustTabObj(trustobj *trust_schema.Platformcrd, helper crdLabelAnnotate.APIHelpers, cli *k8sclient.Clientset, mutex *sync.Mutex,trustedPrefixConf string) {
 	//fmt.Println("cast event name ", trustobj.Name)
 	for index, ele := range trustobj.Spec.HostList {
 		nodeName := trustobj.Spec.HostList[index].Hostname
@@ -211,7 +211,7 @@ func AddTrustTabObj(trustobj *trust_schema.Platformcrd, helper crdLabelAnnotate.
 			glog.Info("Failed to get node within cluster: %s", err.Error())
 			return
 		}
-		lbl, ann := GetPlObjLabel(ele, node)
+		lbl, ann := GetPlObjLabel(ele, node,trustedPrefixConf)
 		mutex.Lock()
 		helper.AddLabelsAnnotations(node, lbl, ann)
 		err = helper.UpdateNode(cli, node)
