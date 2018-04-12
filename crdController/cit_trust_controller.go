@@ -29,6 +29,11 @@ type citPLController struct {
 	queue    workqueue.RateLimitingInterface
 }
 
+type Config struct {
+        Trusted string `"json":"trustedPrefix"`
+}
+
+
 func NewCitPLController(queue workqueue.RateLimitingInterface, indexer cache.Indexer, informer cache.Controller) *citPLController {
 	return &citPLController{
 		informer: informer,
@@ -178,10 +183,6 @@ func GetPlObjLabel(obj trust_schema.HostList, node *api.Node, trustedPrefixConf 
 	annotation[trustsignreport] = obj.TrustTagSignedReport
 
 	return lbl, annotation
-}
-
-type Config struct {
-	Trusted string `"json":"trusted"`
 }
 
 func getPrefixFromConf(path string) string {
