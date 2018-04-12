@@ -5,7 +5,7 @@ SPDX-License-Identifier: BSD-3-Clause
 package main
 
 import (
-	"k8s_custom_cit_controllers-k8s_custom_controllers/crdController"
+	"cit_custom_controller/crdController"
 	"flag"
 	"github.com/golang/glog"
 	apiextcs "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
@@ -34,6 +34,13 @@ func main() {
 	trustedPrefixConf := flag.String("trustedprefixconf", "", "Path to a Trusted Prefix config. Only required if out-of-cluster.")
 	flag.Parse()
 
+	if fi, e := os.Stat(*kubeConf); e == nil {
+		// get the size
+		size := fi.Size()
+		if size > MAXFILESIZE {
+			panic(e.Error())
+		}
+	}
 
 	config, err := GetClientConfig(*kubeConf)
 	if err != nil {
@@ -59,7 +66,7 @@ func main() {
 	// Create a queue
 	queue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "citPLcontroller")
 
-	plindexer, plinformer := crdController.NewPLIndexerInformer(config, queue, crdmutex,*trustedPrefixConf)
+	plindexer, plinformer := crdController.NewPLIndexerInformer(config, queue, crdmutex, *trustedPrefixConf)
 
 	controller := crdController.NewCitPLController(queue, plindexer, plinformer)
 	stop := make(chan struct{})

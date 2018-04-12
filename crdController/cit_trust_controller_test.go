@@ -5,7 +5,7 @@ SPDX-License-Identifier: BSD-3-Clause
 package crdController
 
 import (
-	trust_schema "k8s_custom_cit_controllers-k8s_custom_controllers/crdSchema/citTrustSchema"
+	trust_schema "cit_custom_controller/crdSchema/citTrustSchema"
 	api "k8s.io/client-go/pkg/api/v1"
 	"testing"
 )
@@ -34,7 +34,7 @@ func TestGetPlObjLabel(t *testing.T) {
 	}
 	node := &api.Node{}
 	path := "/opt/cit_k8s_extensions/bin/tag_prefix.conf"
-	recvlabel, recannotate := GetPlObjLabel(trustObj, node)
+	recvlabel, recannotate := GetPlObjLabel(trustObj, node, path)
 	if _, ok := recvlabel[getPrefixFromConf(path)+"trusted"]; ok {
 		t.Logf("Found in PL label Trusted field")
 	} else {

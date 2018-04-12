@@ -5,8 +5,8 @@ SPDX-License-Identifier: BSD-3-Clause
 package crdController
 
 import (
-	"k8s_custom_cit_controllers-k8s_custom_controllers/crdLabelAnnotate"
-	geolocation_schema "k8s_custom_cit_controllers-k8s_custom_controllers/crdSchema/citGeolocationSchema"
+	"cit_custom_controller/crdLabelAnnotate"
+	geolocation_schema "cit_custom_controller/crdSchema/citGeolocationSchema"
 	"fmt"
 	"github.com/golang/glog"
 	"k8s.io/apimachinery/pkg/util/runtime"

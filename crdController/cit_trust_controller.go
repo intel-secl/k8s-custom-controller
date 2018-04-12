@@ -5,8 +5,8 @@ SPDX-License-Identifier: BSD-3-Clause
 package crdController
 
 import (
-	"k8s_custom_cit_controllers-k8s_custom_controllers/crdLabelAnnotate"
-	trust_schema "k8s_custom_cit_controllers-k8s_custom_controllers/crdSchema/citTrustSchema"
+	"cit_custom_controller/crdLabelAnnotate"
+	trust_schema "cit_custom_controller/crdSchema/citTrustSchema"
 	"encoding/json"
 	"fmt"
 	"github.com/golang/glog"
@@ -21,10 +21,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-)
-
-const (
-	CONFPATH string = "/opt/cit_k8s_extensions/bin/tag_prefix.conf"
 )
 
 type citPLController struct {
@@ -156,7 +152,7 @@ func (c *citPLController) runWorker() {
 }
 
 //GetPlObjLabel creates lables and annotations map based on PL CRD
-func GetPlObjLabel(obj trust_schema.HostList, node *api.Node,trustedPrefixConf string) (crdLabelAnnotate.Labels, crdLabelAnnotate.Annotations) {
+func GetPlObjLabel(obj trust_schema.HostList, node *api.Node, trustedPrefixConf string) (crdLabelAnnotate.Labels, crdLabelAnnotate.Annotations) {
 	var lbl = make(crdLabelAnnotate.Labels, 2)
 	var annotation = make(crdLabelAnnotate.Annotations, 1)
 	trustPresent := false
@@ -185,7 +181,7 @@ func GetPlObjLabel(obj trust_schema.HostList, node *api.Node,trustedPrefixConf s
 }
 
 type Config struct {
-	Trusted string `"json":"trustedPrefix"`
+	Trusted string `"json":"trusted"`
 }
 
 func getPrefixFromConf(path string) string {
@@ -202,8 +198,7 @@ func getPrefixFromConf(path string) string {
 }
 
 //AddTrustTabObj Handler for addition event of the TL CRD
-func AddTrustTabObj(trustobj *trust_schema.Platformcrd, helper crdLabelAnnotate.APIHelpers, cli *k8sclient.Clientset, mutex *sync.Mutex,trustedPrefixConf string) {
-	//fmt.Println("cast event name ", trustobj.Name)
+func AddTrustTabObj(trustobj *trust_schema.Platformcrd, helper crdLabelAnnotate.APIHelpers, cli *k8sclient.Clientset, mutex *sync.Mutex, trustedPrefixConf string) {
 	for index, ele := range trustobj.Spec.HostList {
 		nodeName := trustobj.Spec.HostList[index].Hostname
 		node, err := helper.GetNode(cli, nodeName)
@@ -211,7 +206,8 @@ func AddTrustTabObj(trustobj *trust_schema.Platformcrd, helper crdLabelAnnotate.
 			glog.Info("Failed to get node within cluster: %s", err.Error())
 			return
 		}
-		lbl, ann := GetPlObjLabel(ele, node,trustedPrefixConf)
+		lbl, ann := GetPlObjLabel(ele, node, trustedPrefixConf)
+		fmt.Println("lbl", lbl, ann)
 		mutex.Lock()
 		helper.AddLabelsAnnotations(node, lbl, ann)
 		err = helper.UpdateNode(cli, node)
@@ -224,7 +220,7 @@ func AddTrustTabObj(trustobj *trust_schema.Platformcrd, helper crdLabelAnnotate.
 }
 
 //NewPLIndexerInformer returns informer for PL CRD object
-func NewPLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInterface, crdMutex *sync.Mutex,trustedPrefixConf string) (cache.Indexer, cache.Controller) {
+func NewPLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInterface, crdMutex *sync.Mutex, trustedPrefixConf string) (cache.Indexer, cache.Controller) {
 	// Create a new clientset which include our CRD schema
 	crdcs, scheme, err := trust_schema.NewPLClient(config)
 	if err != nil {
@@ -245,7 +241,7 @@ func NewPLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInter
 			if err == nil {
 				queue.Add(key)
 			}
-			AddTrustTabObj(trustobj, hInf, cli, crdMutex,trustedPrefixConf)
+			AddTrustTabObj(trustobj, hInf, cli, crdMutex, trustedPrefixConf)
 		},
 		UpdateFunc: func(old interface{}, new interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(new)
@@ -254,7 +250,7 @@ func NewPLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInter
 			if err == nil {
 				queue.Add(key)
 			}
-			AddTrustTabObj(trustobj, hInf, cli, crdMutex,trustedPrefixConf)
+			AddTrustTabObj(trustobj, hInf, cli, crdMutex, trustedPrefixConf)
 		},
 		DeleteFunc: func(obj interface{}) {
 			// IndexerInformer uses a delta queue, therefore for deletes we have to use this
