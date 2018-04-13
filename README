@@ -5,11 +5,16 @@ Note: You can skip installation of pre-requisites if already installed.
 
 1. Follow steps given in pre-requisites_README on kubernetes master.
 
-2. Run below command from terminal inside the source directory to build 
+2. Install glide vendor package management tool on the machine
 
-	make
+	sudo add-apt-repository ppa:masterminds/glide && sudo apt-get update
+	sudo apt-get install glide
 
-3. To Install run the below command
+3. Copy the source code to $GOPATH/src and run below command for build
+
+        make
+
+4. To Install run the below command
 	make install 
 
 ##############################################################################
