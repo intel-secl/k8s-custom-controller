@@ -24,9 +24,10 @@ STEPS:
 		"trusted":<<prefix for trust tag>>
 	}
 
-2. Update the citk8scontroller.service file as below with tag_prefix.conf file path
+2. Edit the citk8scontroller.service file as below with tag_prefix.conf file path
 	
-	vi /etc/systemd/system
+	vi /etc/systemd/system/citk8scontroller.service
+
 	ExecStart=/opt/cit_k8s_extensions/bin/citk8scontroller-1.0-SNAPSHOT -kubeconf=/etc/kubernetes/admin.conf -trustedprefixconf=<path>/tag_prefix.conf  
 
 2. Run below commands to enable service daemon
