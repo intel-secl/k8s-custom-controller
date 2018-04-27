@@ -19,6 +19,7 @@ LDFLAGS=-ldflags "-X main.Version=${VERSION} -X main.Build=${BUILD}"
 .DEFAULT_GOAL: $(SERVICE)
 $(SERVICE):
 	glide install -v
+	go get -v github.com/go-openapi/strfmt 
 	go build ${LDFLAGS} -o ${SERVICE}-${VERSION} ${SOURCES}
 
 # Install the service binary and the service config files
