@@ -21,7 +21,6 @@ import (
         "strings"
         "sync"
         "time"
-	"log"
 )
 
 type citPLController struct {
@@ -161,10 +160,11 @@ func GetPlObjLabel(obj trust_schema.HostList, node *api.Node, trustedPrefixConf 
 	var lbl = make(crdLabelAnnotate.Labels, 2)
 	var annotation = make(crdLabelAnnotate.Annotations, 1)
 	trustPresent := false
-	trustLabelWithPrefix,err := getPrefixFromConf(trustedPrefixConf) + trustlabel
+	trustLabelWithPrefix,err := getPrefixFromConf(trustedPrefixConf) 
 	if err != nil {
 		return nil,nil,err
 	}
+	trustLabelWithPrefix = trustLabelWithPrefix + trustlabel
 
 	//Comparing with existing node labels
 	for key, value := range node.Labels {
@@ -215,8 +215,7 @@ func AddTrustTabObj(trustobj *trust_schema.Platformcrd, helper crdLabelAnnotate.
 		}
 		lbl, ann ,err := GetPlObjLabel(ele, node, trustedPrefixConf)
 		if err != nil {
-			glog.Info("Failed to get PL object label %v", err)
-			return
+			glog.Fatalf("Error: %v", err)
 		}
 		mutex.Lock()
 		helper.AddLabelsAnnotations(node, lbl, ann)
@@ -234,7 +233,7 @@ func NewPLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInter
 	// Create a new clientset which include our CRD schema
 	crdcs, scheme, err := trust_schema.NewPLClient(config)
 	if err != nil {
-		log.Fatalf("Failed to create new clientset for Platform CRD", err)
+		glog.Fatalf("Failed to create new clientset for Platform CRD", err)
 	}
 
 	// Create a CRD client interface

@@ -3,7 +3,7 @@ Description=Cit k8s custom controller
 ConditionPathExists=/opt/cit_k8s_extensions/bin/citk8scontroller-1.0-SNAPSHOT
 
 [Service]
-ExecStart=/opt/cit_k8s_extensions/bin/citk8scontroller-1.0-SNAPSHOT -kubeconf=/etc/kubernetes/admin.conf -trustedprefixconf=/opt/cit_k8s_extensions/tag_prefix.conf
+ExecStart=/opt/cit_k8s_extensions/bin/citk8scontroller-1.0-SNAPSHOT -kubeconf=/etc/kubernetes/admin.conf -trustedprefixconf=/opt/cit_k8s_extensions/tag_prefix.conf -log_dir=/var/log/syslog
 KillMode=process
 Restart=on-failure
 RestartPreventExitStatus=255

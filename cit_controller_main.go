@@ -13,7 +13,6 @@ import (
         "k8s.io/client-go/tools/clientcmd"
         "k8s.io/client-go/util/workqueue"
         "sync"
-	"log"
 	"fmt"
 )
 
@@ -43,13 +42,13 @@ func main() {
 
 	config, err := GetClientConfig(*kubeConf)
 	if err != nil {
-		log.Println(err)
+		glog.Errorf("Error in config",err)
 		return
 	}
 
 	cs, err := apiextcs.NewForConfig(config)
 	if err != nil {
-		log.Println(err)
+		glog.Errorf(err)
 		return
 	}
 
@@ -61,7 +60,7 @@ func main() {
 	//crdController.NewCitCustomResourceDefinition to create PL CRD
 	err = crdController.NewCitCustomResourceDefinition(cs, &plCrdDef)
 	if err != nil {
-		log.Println("Error in creating platform CRD",err)
+		glog.Errorf("Error in creating platform CRD",err)
 		return
 	}
 
@@ -80,7 +79,7 @@ func main() {
 	// note: if the CRD exist our CreateCRD function is set to exit without an error
 	err = crdController.NewCitCustomResourceDefinition(cs, &glCrdDef)
 	if err != nil {
-		log.Println("Error in creating geolocation CRD",err)
+		glog.Errorf("Error in creating geolocation CRD",err)
 		return
 	}
 
