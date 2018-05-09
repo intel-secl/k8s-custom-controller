@@ -21,6 +21,7 @@ import (
         "strings"
         "sync"
         "time"
+	"log"
 )
 
 type citPLController struct {
@@ -39,7 +40,6 @@ func NewCitPLController(queue workqueue.RateLimitingInterface, indexer cache.Ind
 		informer: informer,
 		indexer:  indexer,
 		queue:    queue,
-		//plObj:    make(map[string]trust_schema.Platformspec),
 	}
 }
 
@@ -225,7 +225,7 @@ func NewPLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInter
 	// Create a new clientset which include our CRD schema
 	crdcs, scheme, err := trust_schema.NewPLClient(config)
 	if err != nil {
-		panic(err)
+		log.Fatalf("Failed to create new clientset for Platform CRD", err)
 	}
 
 	// Create a CRD client interface

@@ -40,7 +40,6 @@ type Geolocationcrd struct {
 	meta_v1.TypeMeta   `json:",inline"`
 	meta_v1.ObjectMeta `json:"metadata"`
 	Spec               geolocationspec `json:"spec"`
-	//Status             geolocationtabstatus `json:"status,omitempty"`
 }
 
 type HostList struct {

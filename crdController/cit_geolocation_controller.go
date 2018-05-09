@@ -18,6 +18,7 @@ import (
         "strings"
         "sync"
         "time"
+	"log"
 )
 
 type citGLController struct {
@@ -152,7 +153,6 @@ func AddGeoTabObj(geoobj *geolocation_schema.Geolocationcrd, helper crdLabelAnno
 		mutex.Unlock()
 		if err != nil {
 			glog.Infof("can't update node: %s", err.Error())
-			//return
 		}
 	}
 }
@@ -184,7 +184,7 @@ func NewGLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInter
 	// Create a new clientset which include our CRD schema
 	crdcs, scheme, err := geolocation_schema.NewGLClient(config)
 	if err != nil {
-		panic(err)
+		log.Fatalf("Failed to create new clientset for geolocation CRD ", err)
 	}
 
 	// Create a CRD client interface

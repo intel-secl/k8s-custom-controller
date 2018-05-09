@@ -12,45 +12,45 @@ import (
         "k8s.io/client-go/rest"
         "k8s.io/client-go/tools/clientcmd"
         "k8s.io/client-go/util/workqueue"
-        "os"
         "sync"
+	"log"
+	"fmt"
 )
 
 
-const MAXFILESIZE int64 = (256 * 1024 * 1024)
 
 // GetClientConfig returns rest config, if path not specified assume in cluster config
 func GetClientConfig(kubeconfig string) (*rest.Config, error) {
-	if kubeconfig != "" {
-		return clientcmd.BuildConfigFromFlags("", kubeconfig)
-	}
-	return rest.InClusterConfig()
+	return clientcmd.BuildConfigFromFlags("", kubeconfig)
 }
 
 func main() {
 
 	glog.V(4).Infof("Starting Cit Custom Controller")
 
-	kubeConf := flag.String("kubeconf", "", "Path to a kube config. Only required if out-of-cluster.")
-	trustedPrefixConf := flag.String("trustedprefixconf", "", "Path to a Trusted Prefix config. Only required if out-of-cluster.")
+	var Usage = func(){
+		fmt.Println("Usage: ./citk8scontroller-1.0-SNAPSHOT -kubeconf=<file path> -trustedprefixconf=<file path>") 
+	}
+
+	kubeConf := flag.String("kubeconf", "", "Path to a kube config. ")
+	trustedPrefixConf := flag.String("trustedprefixconf", "", "Path to a Trusted Prefix config.")
 	flag.Parse()
 
-	if fi, e := os.Stat(*kubeConf); e == nil {
-		// get the size
-		size := fi.Size()
-		if size > MAXFILESIZE {
-			panic(e.Error())
-		}
+	if *kubeConf == "" || *trustedPrefixConf == "" {
+		Usage()
+		return
 	}
 
 	config, err := GetClientConfig(*kubeConf)
 	if err != nil {
-		panic(err.Error())
+		log.Println(err)
+		return
 	}
 
 	cs, err := apiextcs.NewForConfig(config)
 	if err != nil {
-		panic(err.Error())
+		log.Println(err)
+		return
 	}
 
 	//Create mutex to sync operation between the two CRD threads
@@ -61,7 +61,8 @@ func main() {
 	//crdController.NewCitCustomResourceDefinition to create PL CRD
 	err = crdController.NewCitCustomResourceDefinition(cs, &plCrdDef)
 	if err != nil {
-		panic(err)
+		log.Println("Error in creating platform CRD",err)
+		return
 	}
 
 	// Create a queue
@@ -79,7 +80,8 @@ func main() {
 	// note: if the CRD exist our CreateCRD function is set to exit without an error
 	err = crdController.NewCitCustomResourceDefinition(cs, &glCrdDef)
 	if err != nil {
-		panic(err)
+		log.Println("Error in creating geolocation CRD",err)
+		return
 	}
 
 	// Create a queue
