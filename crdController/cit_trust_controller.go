@@ -157,11 +157,15 @@ func (c *citPLController) runWorker() {
 }
 
 //GetPlObjLabel creates lables and annotations map based on PL CRD
-func GetPlObjLabel(obj trust_schema.HostList, node *api.Node, trustedPrefixConf string) (crdLabelAnnotate.Labels, crdLabelAnnotate.Annotations) {
+func GetPlObjLabel(obj trust_schema.HostList, node *api.Node, trustedPrefixConf string) (crdLabelAnnotate.Labels, crdLabelAnnotate.Annotations,error) {
 	var lbl = make(crdLabelAnnotate.Labels, 2)
 	var annotation = make(crdLabelAnnotate.Annotations, 1)
 	trustPresent := false
-	trustLabelWithPrefix := getPrefixFromConf(trustedPrefixConf) + trustlabel
+	trustLabelWithPrefix,err := getPrefixFromConf(trustedPrefixConf) + trustlabel
+	if err != nil {
+		return nil,nil,err
+	}
+
 	//Comparing with existing node labels
 	for key, value := range node.Labels {
 		if key == trustLabelWithPrefix {
@@ -182,20 +186,22 @@ func GetPlObjLabel(obj trust_schema.HostList, node *api.Node, trustedPrefixConf 
 	lbl[trustexpiry] = expiry
 	annotation[trustsignreport] = obj.TrustTagSignedReport
 
-	return lbl, annotation
+	return lbl, annotation,nil
 }
 
-func getPrefixFromConf(path string) string {
+func getPrefixFromConf(path string) (string, error) {
 	out, err := ioutil.ReadFile(path)
 	if err != nil {
-		fmt.Println(err)
+		glog.Errorf("Error: %s %v", path, err)
+		return "",err
 	}
 	s := Config{}
 	err = json.Unmarshal(out, &s)
 	if err != nil {
-		fmt.Println(err)
+		glog.Errorf("Error:  %v", err)
+		return "",err
 	}
-	return s.Trusted
+	return s.Trusted, nil
 }
 
 //AddTrustTabObj Handler for addition event of the TL CRD
@@ -207,8 +213,11 @@ func AddTrustTabObj(trustobj *trust_schema.Platformcrd, helper crdLabelAnnotate.
 			glog.Info("Failed to get node within cluster: %s", err.Error())
 			return
 		}
-		lbl, ann := GetPlObjLabel(ele, node, trustedPrefixConf)
-		fmt.Println("lbl", lbl, ann)
+		lbl, ann ,err := GetPlObjLabel(ele, node, trustedPrefixConf)
+		if err != nil {
+			glog.Info("Failed to get PL object label %v", err)
+			return
+		}
 		mutex.Lock()
 		helper.AddLabelsAnnotations(node, lbl, ann)
 		err = helper.UpdateNode(cli, node)
