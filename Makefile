@@ -25,7 +25,6 @@ $(SERVICE):
 # Install the service binary and the service config files
 .PHONY: install
 install:
-	@service citk8scontroller stop
 	@mkdir -p ${SYSTEMINSTALLDIR} 
 	@cp -f ${SERVICE}-${VERSION} ${SYSTEMINSTALLDIR}
 	@cp -f ${SERVICECONFIG} ${SERVICEINSTALLDIR}
