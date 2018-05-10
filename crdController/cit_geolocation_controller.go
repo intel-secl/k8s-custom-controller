@@ -18,6 +18,7 @@ import (
         "strings"
         "sync"
         "time"
+	"log"
 )
 
 type citGLController struct {
@@ -183,7 +184,7 @@ func NewGLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInter
 	// Create a new clientset which include our CRD schema
 	crdcs, scheme, err := geolocation_schema.NewGLClient(config)
 	if err != nil {
-		glog.Fatalf("Failed to create new clientset for geolocation CRD %s", err)
+		log.Fatalf("Failed to create new clientset for geolocation CRD %s", err)
 	}
 
 	// Create a CRD client interface

@@ -37,7 +37,7 @@ func Getk8sClientHelper(config *rest.Config) (APIHelpers, *k8sclient.Clientset) 
 
 	cli, err := k8sclient.NewForConfig(config)
 	if err != nil {
-		glog.Errorf("Error while creating k8s client")
+		glog.Errorf("Error while creating k8s client %v",err)
 	}
 	return helper, cli
 }

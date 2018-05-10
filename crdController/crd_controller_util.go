@@ -51,7 +51,7 @@ func NewCitCustomResourceDefinition(cs clientset.Interface, crdDef *CrdDefinitio
 		return nil
 	} else {
 		if err := waitForEstablishedCRD(cs, crd.Name); err != nil {
-			glog.Errorf("Failed to establish CRD ")
+			glog.Errorf("Failed to establish CRD %v",err)
 			return err
 		}
 	}

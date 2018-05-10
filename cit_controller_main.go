@@ -42,13 +42,13 @@ func main() {
 
 	config, err := GetClientConfig(*kubeConf)
 	if err != nil {
-		glog.Errorf("Error in config",err)
+		glog.Errorf("Error in config %v",err)
 		return
 	}
 
 	cs, err := apiextcs.NewForConfig(config)
 	if err != nil {
-		glog.Errorf(err)
+		glog.Errorf("Error in config %v",err)
 		return
 	}
 
@@ -60,7 +60,7 @@ func main() {
 	//crdController.NewCitCustomResourceDefinition to create PL CRD
 	err = crdController.NewCitCustomResourceDefinition(cs, &plCrdDef)
 	if err != nil {
-		glog.Errorf("Error in creating platform CRD",err)
+		glog.Errorf("Error in creating platform CRD %v",err)
 		return
 	}
 
@@ -79,7 +79,7 @@ func main() {
 	// note: if the CRD exist our CreateCRD function is set to exit without an error
 	err = crdController.NewCitCustomResourceDefinition(cs, &glCrdDef)
 	if err != nil {
-		glog.Errorf("Error in creating geolocation CRD",err)
+		glog.Errorf("Error in creating geolocation CRD %v",err)
 		return
 	}
 

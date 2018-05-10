@@ -21,6 +21,7 @@ import (
         "strings"
         "sync"
         "time"
+	"log"
 )
 
 type citPLController struct {
@@ -215,7 +216,7 @@ func AddTrustTabObj(trustobj *trust_schema.Platformcrd, helper crdLabelAnnotate.
 		}
 		lbl, ann ,err := GetPlObjLabel(ele, node, trustedPrefixConf)
 		if err != nil {
-			glog.Fatalf("Error: %v", err)
+			log.Fatalf("Error: %v", err)
 		}
 		mutex.Lock()
 		helper.AddLabelsAnnotations(node, lbl, ann)
@@ -233,7 +234,7 @@ func NewPLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInter
 	// Create a new clientset which include our CRD schema
 	crdcs, scheme, err := trust_schema.NewPLClient(config)
 	if err != nil {
-		glog.Fatalf("Failed to create new clientset for Platform CRD", err)
+		log.Fatalf("Failed to create new clientset for Platform CRD %v", err)
 	}
 
 	// Create a CRD client interface
