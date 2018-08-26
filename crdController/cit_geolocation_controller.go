@@ -144,7 +144,7 @@ func AddGeoTabObj(geoobj *geolocation_schema.Geolocationcrd, helper crdLabelAnno
 		node, err := helper.GetNode(cli, nodeName)
 		if err != nil {
 			glog.Infof("failed to get node: %s", err.Error())
-			return
+			continue
 		}
 		lbl, ann := GetGlObjLabel(ele)
 		mutex.Lock()

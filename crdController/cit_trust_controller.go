@@ -212,7 +212,7 @@ func AddTrustTabObj(trustobj *trust_schema.Platformcrd, helper crdLabelAnnotate.
 		node, err := helper.GetNode(cli, nodeName)
 		if err != nil {
 			glog.Info("Failed to get node within cluster: %s", err.Error())
-			return
+			continue
 		}
 		lbl, ann ,err := GetPlObjLabel(ele, node, trustedPrefixConf)
 		if err != nil {
@@ -224,7 +224,6 @@ func AddTrustTabObj(trustobj *trust_schema.Platformcrd, helper crdLabelAnnotate.
 		mutex.Unlock()
 		if err != nil {
 			glog.Info("can't update node: %s", err.Error())
-			return
 		}
 	}
 }
