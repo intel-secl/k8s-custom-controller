@@ -18,8 +18,6 @@ LDFLAGS=-ldflags "-X main.Version=${VERSION} -X main.Build=${BUILD}"
 # Generate the service binary and executable
 .DEFAULT_GOAL: $(SERVICE)
 $(SERVICE):
-	glide install -v
-	go get -v github.com/go-openapi/strfmt 
 	go build ${LDFLAGS} -o ${SERVICE}-${VERSION} ${SOURCES}
 
 # Install the service binary and the service config files
@@ -37,5 +35,4 @@ uninstall:
 # Removes the generated service config and binary files
 .PHONY: clean
 clean:
-	@rm -rf vendor/
 	@rm -f ${SERVICE}-${VERSION}
