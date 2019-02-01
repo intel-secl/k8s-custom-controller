@@ -9,5 +9,5 @@ import (
 )
 
 func TestCitMain(t *testing.T) {
-	t.Logf("Testing cit controller main")
+	t.Logf("Testing isecl controller main")
 }

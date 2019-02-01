@@ -17,7 +17,7 @@ import (
 const (
 	CITGLPlural   string = "geolocationcrds"
 	CITGLSingular string = "geolocationcrd"
-	CITGLGroup    string = "cit.intel.com"
+	CITGLGroup    string = "isecl.intel.com"
 	CITGLKind     string = "GeolocationCrd"
 	CITGLVersion  string = "v1beta1"
 )

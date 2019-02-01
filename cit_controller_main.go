@@ -25,10 +25,10 @@ func GetClientConfig(kubeconfig string) (*rest.Config, error) {
 
 func main() {
 
-	glog.V(4).Infof("Starting Cit Custom Controller")
+	glog.V(4).Infof("Starting ISecL Custom Controller")
 
 	var Usage = func(){
-		fmt.Println("Usage: ./citk8scontroller-1.0-SNAPSHOT -kubeconf=<file path> -trustedprefixconf=<file path>") 
+		fmt.Println("Usage: ./isecl-k8s-controller-1.0-SNAPSHOT -kubeconf=<file path> -trustedprefixconf=<file path>") 
 	}
 
 	kubeConf := flag.String("kubeconf", "", "Path to a kube config. ")
@@ -65,7 +65,7 @@ func main() {
 	}
 
 	// Create a queue
-	queue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "citPLcontroller")
+	queue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "iseclPLcontroller")
 
 	plindexer, plinformer := crdController.NewPLIndexerInformer(config, queue, crdmutex, *trustedPrefixConf)
 
@@ -84,7 +84,7 @@ func main() {
 	}
 
 	// Create a queue
-	glQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "citGLcontroller")
+	glQueue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "iseclGLcontroller")
 
 	glindexer, glinformer := crdController.NewGLIndexerInformer(config, glQueue, crdmutex)
 
@@ -93,7 +93,7 @@ func main() {
 	defer close(stopGl)
 	go geolocationController.Run(1, stopGl)
 
-	glog.V(4).Infof("Waiting for updates on  Cit Custom Resource Definitions")
+	glog.V(4).Infof("Waiting for updates on  ISecl Custom Resource Definitions")
 
 	// Wait forever
 	select {}

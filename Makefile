@@ -1,10 +1,10 @@
-# CIT K8S Custom Controller
+# ISecL K8S Custom Controller
 # Applies labels as per Custom Resource Definitions
 # Author:  <manux.ullas@intel.com>
-DESCRIPTION="CIT K8S Custom Controller"
+DESCRIPTION="ISecL K8S Custom Controller"
 
-SERVICE=citk8scontroller
-SYSTEMINSTALLDIR=/opt/cit_k8s_extensions/bin/
+SERVICE=isecl-k8s-controller
+SYSTEMINSTALLDIR=/opt/isecl_k8s_extensions/bin/
 SERVICEINSTALLDIR=/etc/systemd/system/
 SERVICECONFIG=${SERVICE}.service
 

@@ -33,7 +33,7 @@ STEPS:
 	
 	vi /etc/systemd/system/citk8scontroller.service
 
-	ExecStart=/opt/cit_k8s_extensions/bin/citk8scontroller-1.0-SNAPSHOT -kubeconf=/etc/kubernetes/admin.conf -trustedprefixconf=<path>/tag_prefix.conf  
+	ExecStart=/opt/isecl_k8s_extensions/bin/isecl-k8s-controller-1.0-SNAPSHOT -kubeconf=/etc/kubernetes/admin.conf -trustedprefixconf=<path>/tag_prefix.conf  
 
 2. Run below commands to enable service daemon
 
@@ -41,13 +41,13 @@ STEPS:
 
 3. Run the custom controller using below command	
 
-	systemctl start citk8scontroller.service
+	systemctl start isecl-k8s-controller.service
 
 4. To check status of this service run below command
 	
-	systemctl status citk8scontroller.service
+	systemctl status isecl-k8s-controller.service
 
 5. To stop this service run below command
 	
-	systemctl stop citk8scontroller.service
+	systemctl stop isecl-k8s-controller.service
 

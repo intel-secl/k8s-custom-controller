@@ -18,7 +18,7 @@ const (
 	CITPLPlural   string = "platformcrds"
 	CITPLSingular string = "platformcrd"
 	CITPLKind     string = "PlatformCrd"
-	CITPLGroup    string = "cit.intel.com"
+	CITPLGroup    string = "isecl.intel.com"
 	CITPLVersion  string = "v1beta1"
 )
 
