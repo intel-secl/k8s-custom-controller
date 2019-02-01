@@ -32,7 +32,7 @@ install:
 # Uninstalls the service binary and the service config files
 .PHONY: uninstall
 uninstall:
-	@service citk8scontroller stop && rm -f ${SERVICEINSTALLDIR}/${SERVICE} ${SERVICEINSTALLDIR}/${SERVICECONFIG}
+	@service isecl-k8s-controller stop && rm -f ${SERVICEINSTALLDIR}/${SERVICE} ${SERVICEINSTALLDIR}/${SERVICECONFIG}
 
 # Removes the generated service config and binary files
 .PHONY: clean

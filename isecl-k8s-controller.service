@@ -1,6 +1,6 @@
 [Unit]
 Description=ISecL k8s custom controller
-ConditionPathExists=/opt/cit_k8s_extensions/bin/citk8scontroller-1.0-SNAPSHOT
+ConditionPathExists=/opt/isecl-k8s-extensions/bin/isecl-k8s-controller-1.0-SNAPSHOT
 
 [Service]
 ExecStart=/opt/isecl-k8s-extensions/bin/isecl-k8s-controller-1.0-SNAPSHOT -kubeconf=/etc/kubernetes/admin.conf -trustedprefixconf=/opt/isecl-k8s-extensions/tag_prefix.conf -log_dir=/var/log/syslog
@@ -11,5 +11,5 @@ Type=simple
 
 [Install]
 WantedBy=multi-user.target
-Alias=citk8scontroller.service
+Alias=isecl-k8s-controller.service
 
