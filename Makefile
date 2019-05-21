@@ -4,7 +4,7 @@
 DESCRIPTION="ISecL K8S Custom Controller"
 
 SERVICE=isecl-k8s-controller
-SYSTEMINSTALLDIR=/opt/isecl_k8s_extensions/bin/
+SYSTEMINSTALLDIR=/opt/isecl-k8s-extensions/bin/
 SERVICEINSTALLDIR=/etc/systemd/system/
 SERVICECONFIG=${SERVICE}.service
 
