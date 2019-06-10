@@ -5,22 +5,20 @@ SPDX-License-Identifier: BSD-3-Clause
 package crdController
 
 import (
-        "github.com/golang/glog"
-        apiextensionsv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
-        clientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
-        apierrors "k8s.io/apimachinery/pkg/api/errors"
-        metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-        "k8s.io/apimachinery/pkg/util/wait"
-        "time"
-)
+	"time"
 
+	"github.com/golang/glog"
+	apiextensionsv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
+	clientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/wait"
+)
 
 const (
 	trustexpiry     = "TrustTagExpiry"
 	trustlabel      = "trusted"
 	trustsignreport = "TrustTagSignedReport"
-	assetexpiry     = "AssetTagExpiry"
-	assetsignreport = "AssetTagSignedReport"
 )
 
 type CrdDefinition struct {
@@ -30,8 +28,8 @@ type CrdDefinition struct {
 	Kind     string
 }
 
-//NewCitCustomResourceDefinition Creates new CIT CRD's
-func NewCitCustomResourceDefinition(cs clientset.Interface, crdDef *CrdDefinition) error {
+//NewIseclCustomResourceDefinition Creates new ISecL CRD's
+func NewIseclCustomResourceDefinition(cs clientset.Interface, crdDef *CrdDefinition) error {
 	crd := &apiextensionsv1beta1.CustomResourceDefinition{
 		ObjectMeta: metav1.ObjectMeta{Name: crdDef.Plural + "." + crdDef.Group},
 		Spec: apiextensionsv1beta1.CustomResourceDefinitionSpec{
@@ -47,11 +45,11 @@ func NewCitCustomResourceDefinition(cs clientset.Interface, crdDef *CrdDefinitio
 	}
 	_, err := cs.ApiextensionsV1beta1().CustomResourceDefinitions().Create(crd)
 	if err != nil && apierrors.IsAlreadyExists(err) {
-		glog.Infof("CIT CRD object allready exisists")
+		glog.Infof("ISECL HostAttributes CRD object allready exisists")
 		return nil
 	} else {
 		if err := waitForEstablishedCRD(cs, crd.Name); err != nil {
-			glog.Errorf("Failed to establish CRD %v",err)
+			glog.Errorf("Failed to establish CRD %v", err)
 			return err
 		}
 	}

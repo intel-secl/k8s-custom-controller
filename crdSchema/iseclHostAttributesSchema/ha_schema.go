@@ -2,7 +2,7 @@
 Copyright © 2018 Intel Corporation
 SPDX-License-Identifier: BSD-3-Clause
 */
-package crdGeolocationSchema
+package crdHostAttributesSchema
 
 import (
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -15,70 +15,65 @@ import (
 )
 
 const (
-	CITGLPlural   string = "geolocationcrds"
-	CITGLSingular string = "geolocationcrd"
-	CITGLGroup    string = "isecl.intel.com"
-	CITGLKind     string = "GeolocationCrd"
-	CITGLVersion  string = "v1beta1"
+	HAPlural   string = "hostattributes"
+	HASingular string = "crd"
+	HAKind     string = "HostAttributesCrd"
+	HAGroup    string = "crd.isecl.intel.com"
+	HAVersion  string = "v1beta1"
 )
 
-//CitGLClient returns rest client for the GL CRD
-func CitGLClient(cl *rest.RESTClient, scheme *runtime.Scheme, namespace string) *citglclient {
-	return &citglclient{cl: cl, ns: namespace, plural: CITGLPlural,
+//HAClient returns CRD clientset required to apply watch on the CRD
+func HAClient(cl *rest.RESTClient, scheme *runtime.Scheme, namespace string) *haclient {
+	return &haclient{cl: cl, ns: namespace, plural: HAPlural,
 		codec: runtime.NewParameterCodec(scheme)}
 }
 
-type citglclient struct {
+type haclient struct {
 	cl     *rest.RESTClient
 	ns     string
 	plural string
 	codec  runtime.ParameterCodec
 }
 
-// Definition of our CRD Example class
-type Geolocationcrd struct {
+type HostAttributesCrd struct {
 	meta_v1.TypeMeta   `json:",inline"`
 	meta_v1.ObjectMeta `json:"metadata"`
-	Spec               geolocationspec `json:"spec"`
+	Spec               Spec `json:"spec"`
 }
 
-type HostList struct {
-	Hostname             string            `json:"hostName"`
-	AssetTagExpiry       string            `json:"validTo"`
-	Assettag             map[string]string `json:"assetTags"`
-	AssetTagSignedReport string            `json:"signedTrustReport"`
+type Host struct {
+	Hostname     string            `json:"hostName"`
+	Trusted      string            `json:"trusted"`
+	Expiry       string            `json:"validTo"`
+	SignedReport string            `json:"signedTrustReport"`
+	Assettag     map[string]string `json:"assetTags"`
 }
 
-type geolocationspec struct {
-	HostList []HostList `json:"hostList"`
+type Spec struct {
+	HostList []Host `json:"hostList"`
 }
 
-type geolocationtabstatus struct {
-	State   string `json:"state,omitempty"`
-	Message string `json:"message,omitempty"`
-}
-
-type GeolocationCrdList struct {
+type HostAttributesCrdList struct {
 	meta_v1.TypeMeta `json:",inline"`
 	meta_v1.ListMeta `json:"metadata"`
-	Items            []Geolocationcrd `json:"items"`
+	Items            []HostAttributesCrd `json:"items"`
 }
 
 // Create a  Rest client with the new CRD Schema
-var SchemeGroupVersion = schema.GroupVersion{Group: CITGLGroup, Version: CITGLVersion}
+var SchemeGroupVersion = schema.GroupVersion{Group: HAGroup, Version: HAVersion}
 
 //addKnownTypes adds the set of types defined in this package to the supplied scheme.
 func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemeGroupVersion,
-		&Geolocationcrd{},
-		&GeolocationCrdList{},
+		&HostAttributesCrd{},
+		&HostAttributesCrdList{},
 	)
 	meta_v1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil
 }
 
-//NewTLClient registers CRD schema and returns rest client for the CRD
-func NewGLClient(cfg *rest.Config) (*rest.RESTClient, *runtime.Scheme, error) {
+//NewPLClient registers CRD schema and returns rest client for the CRD
+func NewHAClient(cfg *rest.Config) (*rest.RESTClient, *runtime.Scheme, error) {
 	scheme := runtime.NewScheme()
 	SchemeBuilder := runtime.NewSchemeBuilder(addKnownTypes)
 	if err := SchemeBuilder.AddToScheme(scheme); err != nil {
@@ -98,7 +93,7 @@ func NewGLClient(cfg *rest.Config) (*rest.RESTClient, *runtime.Scheme, error) {
 	return client, scheme, nil
 }
 
-// Create a new List watch for our GL CRD
-func (f *citglclient) NewGLListWatch() *cache.ListWatch {
+// Create a new List watch for our HA CRD
+func (f *haclient) NewHAListWatch() *cache.ListWatch {
 	return cache.NewListWatchFromClient(f.cl, f.plural, f.ns, fields.Everything())
 }

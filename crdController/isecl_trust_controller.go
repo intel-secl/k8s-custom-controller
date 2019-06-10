@@ -5,54 +5,54 @@ SPDX-License-Identifier: BSD-3-Clause
 package crdController
 
 import (
-        "k8s_custom_cit_controllers-k8s_custom_controllers/crdLabelAnnotate"
-        trust_schema "k8s_custom_cit_controllers-k8s_custom_controllers/crdSchema/citTrustSchema"
-        "encoding/json"
-        "fmt"
-        "github.com/golang/glog"
-        "io/ioutil"
-        "k8s.io/apimachinery/pkg/util/runtime"
-        "k8s.io/apimachinery/pkg/util/wait"
-        k8sclient "k8s.io/client-go/kubernetes"
-        api "k8s.io/client-go/pkg/api/v1"
-        "k8s.io/client-go/rest"
-        "k8s.io/client-go/tools/cache"
-        "k8s.io/client-go/util/workqueue"
-        "strings"
-        "sync"
-        "time"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"k8s_custom_cit_controllers-k8s_custom_controllers/crdLabelAnnotate"
+	ha_schema "k8s_custom_cit_controllers-k8s_custom_controllers/crdSchema/iseclHostAttributesSchema"
 	"log"
+	"strings"
+	"sync"
+	"time"
+
+	"github.com/golang/glog"
+	"k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/apimachinery/pkg/util/wait"
+	k8sclient "k8s.io/client-go/kubernetes"
+	api "k8s.io/client-go/pkg/api/v1"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/cache"
+	"k8s.io/client-go/util/workqueue"
 )
 
-type citPLController struct {
+type IseclHAController struct {
 	indexer  cache.Indexer
 	informer cache.Controller
 	queue    workqueue.RateLimitingInterface
 }
 
 type Config struct {
-        Trusted string `"json":"trustedPrefix"`
+	Trusted string `"json":"trusted"`
 }
 
-
-func NewCitPLController(queue workqueue.RateLimitingInterface, indexer cache.Indexer, informer cache.Controller) *citPLController {
-	return &citPLController{
+func NewIseclHAController(queue workqueue.RateLimitingInterface, indexer cache.Indexer, informer cache.Controller) *IseclHAController {
+	return &IseclHAController{
 		informer: informer,
 		indexer:  indexer,
 		queue:    queue,
 	}
 }
 
-func GetPLCrdDef() CrdDefinition {
+func GetHACrdDef() CrdDefinition {
 	return CrdDefinition{
-		Plural:   trust_schema.CITPLPlural,
-		Singular: trust_schema.CITPLSingular,
-		Group:    trust_schema.CITPLGroup,
-		Kind:     trust_schema.CITPLKind,
+		Plural:   ha_schema.HAPlural,
+		Singular: ha_schema.HASingular,
+		Group:    ha_schema.HAGroup,
+		Kind:     ha_schema.HAKind,
 	}
 }
 
-func (c *citPLController) processNextItem() bool {
+func (c *IseclHAController) processNextItem() bool {
 	// Wait until there is a new item in the working queue
 	key, quit := c.queue.Get()
 	if quit {
@@ -75,7 +75,7 @@ func (c *citPLController) processNextItem() bool {
 }
 
 //processPLQueue : can be extended to validate the crd objects are been acted upon
-func (c *citPLController) processPLQueue(key string) error {
+func (c *IseclHAController) processPLQueue(key string) error {
 	glog.Infof("processPLQueue for Key %#v ", key)
 	return nil
 }
@@ -83,7 +83,7 @@ func (c *citPLController) processPLQueue(key string) error {
 // syncFromQueue is the business logic of the controller. In this controller it simply prints
 // information about the CRD to stdout. In case an error happened, it has to simply return the error.
 // The retry logic should not be part of the business logic.
-func (c *citPLController) syncFromQueue(key string) error {
+func (c *IseclHAController) syncFromQueue(key string) error {
 	obj, exists, err := c.indexer.GetByKey(key)
 	if err != nil {
 		glog.Errorf("Fetching object with key %s from store failed with %v", key, err)
@@ -103,7 +103,7 @@ func (c *citPLController) syncFromQueue(key string) error {
 }
 
 // handleErr checks if an error happened and makes sure we will retry later.
-func (c *citPLController) handleErr(err error, key interface{}) {
+func (c *IseclHAController) handleErr(err error, key interface{}) {
 	if err == nil {
 		// Forget about the #AddRateLimited history of the key on every successful synchronization.
 		// This ensures that future processing of updates for this key is not delayed because of
@@ -128,7 +128,7 @@ func (c *citPLController) handleErr(err error, key interface{}) {
 	glog.Infof("Dropping CRD %q out of the queue: %v", key, err)
 }
 
-func (c *citPLController) Run(threadiness int, stopCh chan struct{}) {
+func (c *IseclHAController) Run(threadiness int, stopCh chan struct{}) {
 	defer runtime.HandleCrash()
 
 	// Let the workers stop when we are done
@@ -151,21 +151,29 @@ func (c *citPLController) Run(threadiness int, stopCh chan struct{}) {
 	glog.Info("Stopping Platform controller")
 }
 
-func (c *citPLController) runWorker() {
+func (c *IseclHAController) runWorker() {
 	for c.processNextItem() {
 	}
 }
 
-//GetPlObjLabel creates lables and annotations map based on PL CRD
-func GetPlObjLabel(obj trust_schema.HostList, node *api.Node, trustedPrefixConf string) (crdLabelAnnotate.Labels, crdLabelAnnotate.Annotations,error) {
-	var lbl = make(crdLabelAnnotate.Labels, 2)
+//GetHaObjLabel creates lables and annotations map based on HA CRD
+func GetHaObjLabel(obj ha_schema.Host, node *api.Node, trustedPrefixConf string) (crdLabelAnnotate.Labels, crdLabelAnnotate.Annotations, error) {
+	assetTagsize := len(obj.Assettag)
+
+	var lbl = make(crdLabelAnnotate.Labels, assetTagsize+2)
 	var annotation = make(crdLabelAnnotate.Annotations, 1)
 	trustPresent := false
-	trustLabelWithPrefix,err := getPrefixFromConf(trustedPrefixConf) 
+	trustLabelWithPrefix, err := getPrefixFromConf(trustedPrefixConf)
 	if err != nil {
-		return nil,nil,err
+		return nil, nil, err
 	}
 	trustLabelWithPrefix = trustLabelWithPrefix + trustlabel
+
+	for key, val := range obj.Assettag {
+		labelkey := strings.Replace(key, " ", ".", -1)
+		labelkey = strings.Replace(labelkey, ":", ".", -1)
+		lbl[labelkey] = val
+	}
 
 	//Comparing with existing node labels
 	for key, value := range node.Labels {
@@ -183,38 +191,38 @@ func GetPlObjLabel(obj trust_schema.HostList, node *api.Node, trustedPrefixConf 
 		glog.Info("Trust value was not present on node adding for first time")
 		lbl[trustLabelWithPrefix] = obj.Trusted
 	}
-	expiry := strings.Replace(obj.TrustTagExpiry, ":", ".", -1)
+	expiry := strings.Replace(obj.Expiry, ":", ".", -1)
 	lbl[trustexpiry] = expiry
-	annotation[trustsignreport] = obj.TrustTagSignedReport
+	annotation[trustsignreport] = obj.SignedReport
 
-	return lbl, annotation,nil
+	return lbl, annotation, nil
 }
 
 func getPrefixFromConf(path string) (string, error) {
 	out, err := ioutil.ReadFile(path)
 	if err != nil {
 		glog.Errorf("Error: %s %v", path, err)
-		return "",err
+		return "", err
 	}
 	s := Config{}
 	err = json.Unmarshal(out, &s)
 	if err != nil {
 		glog.Errorf("Error:  %v", err)
-		return "",err
+		return "", err
 	}
 	return s.Trusted, nil
 }
 
-//AddTrustTabObj Handler for addition event of the TL CRD
-func AddTrustTabObj(trustobj *trust_schema.Platformcrd, helper crdLabelAnnotate.APIHelpers, cli *k8sclient.Clientset, mutex *sync.Mutex, trustedPrefixConf string) {
-	for index, ele := range trustobj.Spec.HostList {
-		nodeName := trustobj.Spec.HostList[index].Hostname
+//AddHostAttributesTabObj Handler for addition event of the HA CRD
+func AddHostAttributesTabObj(haobj *ha_schema.HostAttributesCrd, helper crdLabelAnnotate.APIHelpers, cli *k8sclient.Clientset, mutex *sync.Mutex, trustedPrefixConf string) {
+	for index, ele := range haobj.Spec.HostList {
+		nodeName := haobj.Spec.HostList[index].Hostname
 		node, err := helper.GetNode(cli, nodeName)
 		if err != nil {
 			glog.Info("Failed to get node within cluster: %s", err.Error())
 			continue
 		}
-		lbl, ann ,err := GetPlObjLabel(ele, node, trustedPrefixConf)
+		lbl, ann, err := GetHaObjLabel(ele, node, trustedPrefixConf)
 		if err != nil {
 			log.Fatalf("Error: %v", err)
 		}
@@ -228,38 +236,38 @@ func AddTrustTabObj(trustobj *trust_schema.Platformcrd, helper crdLabelAnnotate.
 	}
 }
 
-//NewPLIndexerInformer returns informer for PL CRD object
-func NewPLIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInterface, crdMutex *sync.Mutex, trustedPrefixConf string) (cache.Indexer, cache.Controller) {
+//NewIseclHAIndexerInformer returns informer for HA CRD object
+func NewIseclHAIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInterface, crdMutex *sync.Mutex, trustedPrefixConf string) (cache.Indexer, cache.Controller) {
 	// Create a new clientset which include our CRD schema
-	crdcs, scheme, err := trust_schema.NewPLClient(config)
+	crdcs, scheme, err := ha_schema.NewHAClient(config)
 	if err != nil {
 		log.Fatalf("Failed to create new clientset for Platform CRD %v", err)
 	}
 
 	// Create a CRD client interface
-	plcrdclient := trust_schema.CitPLClient(crdcs, scheme, "default")
+	hacrdclient := ha_schema.HAClient(crdcs, scheme, "default")
 
 	//Create a PL CRD Helper object
 	hInf, cli := crdLabelAnnotate.Getk8sClientHelper(config)
 
-	return cache.NewIndexerInformer(plcrdclient.NewPLListWatch(), &trust_schema.Platformcrd{}, 0, cache.ResourceEventHandlerFuncs{
+	return cache.NewIndexerInformer(hacrdclient.NewHAListWatch(), &ha_schema.HostAttributesCrd{}, 0, cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(obj)
 			glog.Info("Received Add event for ", key)
-			trustobj := obj.(*trust_schema.Platformcrd)
+			haobj := obj.(*ha_schema.HostAttributesCrd)
 			if err == nil {
 				queue.Add(key)
 			}
-			AddTrustTabObj(trustobj, hInf, cli, crdMutex, trustedPrefixConf)
+			AddHostAttributesTabObj(haobj, hInf, cli, crdMutex, trustedPrefixConf)
 		},
 		UpdateFunc: func(old interface{}, new interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(new)
 			glog.Info("Received Update event for ", key)
-			trustobj := new.(*trust_schema.Platformcrd)
+			haobj := new.(*ha_schema.HostAttributesCrd)
 			if err == nil {
 				queue.Add(key)
 			}
-			AddTrustTabObj(trustobj, hInf, cli, crdMutex, trustedPrefixConf)
+			AddHostAttributesTabObj(haobj, hInf, cli, crdMutex, trustedPrefixConf)
 		},
 		DeleteFunc: func(obj interface{}) {
 			// IndexerInformer uses a delta queue, therefore for deletes we have to use this
