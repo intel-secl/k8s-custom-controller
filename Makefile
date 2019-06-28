@@ -1,6 +1,11 @@
+#/*
+#Copyright © 2019 Intel Corporation
+#SPDX-License-Identifier: BSD-3-Clause
+#*/
+
 # ISecL K8S Custom Controller
 # Applies labels as per Custom Resource Definitions
-# Author:  <manux.ullas@intel.com>
+
 DESCRIPTION="ISecL K8S Custom Controller"
 
 SERVICE=isecl-k8s-controller

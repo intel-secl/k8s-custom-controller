@@ -1,13 +1,15 @@
 /*
-Copyright © 2018 Intel Corporation
+Copyright © 2019 Intel Corporation
 SPDX-License-Identifier: BSD-3-Clause
 */
+
 package crdController
 
 import (
 	trust_schema "k8s_custom_cit_controllers-k8s_custom_controllers/crdSchema/iseclHostAttributesSchema"
-	api "k8s.io/client-go/pkg/api/v1"
 	"testing"
+
+	api "k8s.io/client-go/pkg/api/v1"
 )
 
 func TestGetPLCrdDef(t *testing.T) {
@@ -27,10 +29,10 @@ func TestGetPLCrdDef(t *testing.T) {
 
 func TestGetPlObjLabel(t *testing.T) {
 	trustObj := trust_schema.HostList{
-		Hostname:             "Node123",
-		Trusted:              "true",
-		Expiry:       		  "12-23-45T123.91.12",
-		SignedReport:         "495270d6242e2c67e24e22bad49dgdah",
+		Hostname:     "Node123",
+		Trusted:      "true",
+		Expiry:       "12-23-45T123.91.12",
+		SignedReport: "495270d6242e2c67e24e22bad49dgdah",
 		Assettag: map[string]string{
 			"country.us":  "true",
 			"country.uk":  "true",

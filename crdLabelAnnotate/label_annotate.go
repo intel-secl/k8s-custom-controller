@@ -1,7 +1,8 @@
 /*
-Copyright © 2018 Intel Corporation
+Copyright © 2019 Intel Corporation
 SPDX-License-Identifier: BSD-3-Clause
 */
+
 package crdLabelAnnotate
 
 import (
@@ -37,7 +38,7 @@ func Getk8sClientHelper(config *rest.Config) (APIHelpers, *k8sclient.Clientset) 
 
 	cli, err := k8sclient.NewForConfig(config)
 	if err != nil {
-		glog.Errorf("Error while creating k8s client %v",err)
+		glog.Errorf("Error while creating k8s client %v", err)
 	}
 	return helper, cli
 }
