@@ -1,21 +1,11 @@
 ##############################################################################
 Pre-requisites for building the controller from source
 ##############################################################################
-Note: You can skip installation of pre-requisites if already installed.
+Pre-requisites:
+	golang >= 1.11.2
 
-1. Follow steps given in pre-requisites_README on kubernetes master.
-
-2. Install glide vendor package management tool on the machine
-
-	sudo add-apt-repository ppa:masterminds/glide && sudo apt-get update
-	sudo apt-get install glide
-
-3. Copy the source code to $GOPATH/src and run below command for build
-
-        make
-
-4. To Install run the below command
-	make install 
+Compile:
+	make
 
 ##############################################################################
 Installation of binary on kubernetes master machine
@@ -24,30 +14,28 @@ Pre-requisites
 Kubernetes cluster should be up and running
 
 STEPS:
-1. Create tag_prefix.conf file in k8s master machine with below json.
-	{
-		"trusted":<<prefix for trust tag>>
-	}
-
-2. Edit the citk8scontroller.service file as below with tag_prefix.conf file path
+1. Copy the complete source code to K8s master node and run below command for Installation
 	
-	vi /etc/systemd/system/citk8scontroller.service
+	make install
 
-	ExecStart=/opt/isecl_k8s_extensions/bin/isecl-k8s-controller-1.0-SNAPSHOT -kubeconf=/etc/kubernetes/admin.conf -trustedprefixconf=<path>/tag_prefix.conf  
+2. Edit the isecl-k8s-controller.service file as below with tag_prefix.conf file path
+	
+	vi /etc/systemd/system/isecl-k8s-controller.service
 
-2. Run below commands to enable service daemon
+	ExecStart=/opt/isecl-k8s-extensions/bin/isecl-k8s-controller-1.0-SNAPSHOT -kubeconf=/etc/kubernetes/admin.conf -trustedprefixconf=<path>/tag_prefix.conf  
+
+3. Run below commands to enable service daemon
 
 	systemctl daemon-reload  #(to activate newly added service)
 
-3. Run the custom controller using below command	
+4. Run the custom controller using below command	
 
 	systemctl start isecl-k8s-controller.service
 
-4. To check status of this service run below command
+5. To check status of this service run below command
 	
 	systemctl status isecl-k8s-controller.service
 
-5. To stop this service run below command
+6. To stop this service run below command
 	
 	systemctl stop isecl-k8s-controller.service
-
