@@ -170,13 +170,15 @@ func GetHaObjLabel(obj ha_schema.Host, node *api.Node, trustedPrefixConf string)
 	var annotation = make(crdLabelAnnotate.Annotations, 1)
 	trustPresent := false
 	trustLabelWithPrefix, err := getPrefixFromConf(trustedPrefixConf)
-	if !StringReg.MatchString(trustLabelWithPrefix) && len(trustLabelWithPrefix) > MAX_PREFIX_LEN {
-			return nil, nil, errors.New("Invalid string formatted input")
-		}
 
 	if err != nil {
 		return nil, nil, err
 	}
+	
+	if !StringReg.MatchString(trustLabelWithPrefix) || len(trustLabelWithPrefix) > MAX_PREFIX_LEN {
+                        return nil, nil, errors.New("Invalid string formatted input")
+        }
+
 	trustLabelWithPrefix = trustLabelWithPrefix + trustlabel
 	
 	for key, val := range obj.Assettag {
