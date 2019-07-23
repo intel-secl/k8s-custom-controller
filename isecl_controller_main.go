@@ -23,19 +23,20 @@ func GetClientConfig(kubeconfig string) (*rest.Config, error) {
 	return clientcmd.BuildConfigFromFlags("", kubeconfig)
 }
 
+const TrustedPrefixConf = "/opt/isecl-k8s-extensions/tag_prefix.conf"
+
 func main() {
 
 	glog.V(4).Infof("Starting ISecL Custom Controller")
 
 	var Usage = func() {
-		fmt.Println("Usage: ./isecl-k8s-controller-1.0-SNAPSHOT -kubeconf=<file path> -trustedprefixconf=<file path>")
+		fmt.Println("Usage: ./isecl-k8s-controller-1.0-SNAPSHOT -kubeconf=<file path>")
 	}
 
 	kubeConf := flag.String("kubeconf", "", "Path to a kube config. ")
-	trustedPrefixConf := flag.String("trustedprefixconf", "", "Path to a Trusted Prefix config.")
 	flag.Parse()
 
-	if *kubeConf == "" || *trustedPrefixConf == "" {
+	if *kubeConf == "" {
 		Usage()
 		return
 	}
@@ -67,7 +68,7 @@ func main() {
 	// Create a queue
 	queue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "iseclcontroller")
 
-	indexer, informer := crdController.NewIseclHAIndexerInformer(config, queue, crdmutex, *trustedPrefixConf)
+	indexer, informer := crdController.NewIseclHAIndexerInformer(config, queue, crdmutex, TrustedPrefixConf)
 
 	controller := crdController.NewIseclHAController(queue, indexer, informer)
 	stop := make(chan struct{})
