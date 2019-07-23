@@ -7,11 +7,13 @@ package crdController
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"k8s_custom_cit_controllers-k8s_custom_controllers/crdLabelAnnotate"
 	ha_schema "k8s_custom_cit_controllers-k8s_custom_controllers/crdSchema/iseclHostAttributesSchema"
 	"log"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -25,6 +27,9 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 )
+
+const MAX_PREFIX_LEN = 20
+var StringReg = regexp.MustCompile("(^[a-zA-Z0-9_///.-]*$)")
 
 type IseclHAController struct {
 	indexer  cache.Indexer
@@ -165,11 +170,15 @@ func GetHaObjLabel(obj ha_schema.Host, node *api.Node, trustedPrefixConf string)
 	var annotation = make(crdLabelAnnotate.Annotations, 1)
 	trustPresent := false
 	trustLabelWithPrefix, err := getPrefixFromConf(trustedPrefixConf)
+	if !StringReg.MatchString(trustLabelWithPrefix) && len(trustLabelWithPrefix) > MAX_PREFIX_LEN {
+			return nil, nil, errors.New("Invalid string formatted input")
+		}
+
 	if err != nil {
 		return nil, nil, err
 	}
 	trustLabelWithPrefix = trustLabelWithPrefix + trustlabel
-
+	
 	for key, val := range obj.Assettag {
 		labelkey := strings.Replace(key, " ", ".", -1)
 		labelkey = strings.Replace(labelkey, ":", ".", -1)
