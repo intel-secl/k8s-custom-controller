@@ -9,10 +9,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"k8s_custom_cit_controllers-k8s_custom_controllers/crdLabelAnnotate"
 	ha_schema "k8s_custom_cit_controllers-k8s_custom_controllers/crdSchema/iseclHostAttributesSchema"
 	"log"
+	"os"
 	"regexp"
 	"strings"
 	"sync"
@@ -28,8 +28,9 @@ import (
 	"k8s.io/client-go/util/workqueue"
 )
 
-const MAX_PREFIX_LEN = 20
 var StringReg = regexp.MustCompile("(^[a-zA-Z0-9_///.-]*$)")
+
+const MAX_BYTES_LEN = 200
 
 type IseclHAController struct {
 	indexer  cache.Indexer
@@ -174,13 +175,13 @@ func GetHaObjLabel(obj ha_schema.Host, node *api.Node, trustedPrefixConf string)
 	if err != nil {
 		return nil, nil, err
 	}
-	
-	if !StringReg.MatchString(trustLabelWithPrefix) || len(trustLabelWithPrefix) > MAX_PREFIX_LEN {
-                        return nil, nil, errors.New("Invalid string formatted input")
-        }
+
+	if !StringReg.MatchString(trustLabelWithPrefix) {
+		return nil, nil, errors.New("Invalid string formatted input")
+	}
 
 	trustLabelWithPrefix = trustLabelWithPrefix + trustlabel
-	
+
 	for key, val := range obj.Assettag {
 		labelkey := strings.Replace(key, " ", ".", -1)
 		labelkey = strings.Replace(labelkey, ":", ".", -1)
@@ -211,13 +212,16 @@ func GetHaObjLabel(obj ha_schema.Host, node *api.Node, trustedPrefixConf string)
 }
 
 func getPrefixFromConf(path string) (string, error) {
-	out, err := ioutil.ReadFile(path)
+	out, err := os.Open(path)
 	if err != nil {
 		glog.Errorf("Error: %s %v", path, err)
 		return "", err
 	}
+
+	defer out.Close()
+	readBytes := make([]byte, MAX_BYTES_LEN)
 	s := Config{}
-	err = json.Unmarshal(out, &s)
+	err = json.Unmarshal(readBytes, &s)
 	if err != nil {
 		glog.Errorf("Error:  %v", err)
 		return "", err
