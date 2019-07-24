@@ -212,21 +212,25 @@ func GetHaObjLabel(obj ha_schema.Host, node *api.Node, trustedPrefixConf string)
 }
 
 func getPrefixFromConf(path string) (string, error) {
-	out, err := os.Open(path)
-	if err != nil {
-		glog.Errorf("Error: %s %v", path, err)
-		return "", err
-	}
+        out, err := os.Open(path)
+        if err != nil {
+                glog.Errorf("Error: %s %v", path, err)
+                return "", err
+        }
 
-	defer out.Close()
-	readBytes := make([]byte, MAX_BYTES_LEN)
-	s := Config{}
-	err = json.Unmarshal(readBytes, &s)
-	if err != nil {
-		glog.Errorf("Error:  %v", err)
-		return "", err
-	}
-	return s.Trusted, nil
+        defer out.Close()
+        readBytes := make([]byte, MAX_BYTES_LEN)
+        n, err := out.Read(readBytes)
+        if err != nil {
+                return "", err
+        }
+        s := Config{}
+        err = json.Unmarshal(readBytes[:n], &s)
+        if err != nil {
+                glog.Errorf("Error:  %v", err)
+                return "", err
+        }
+        return s.Trusted, nil
 }
 
 //AddHostAttributesTabObj Handler for addition event of the HA CRD
