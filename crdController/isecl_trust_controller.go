@@ -7,11 +7,13 @@ package crdController
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
-	"io/ioutil"
 	"k8s_custom_cit_controllers-k8s_custom_controllers/crdLabelAnnotate"
 	ha_schema "k8s_custom_cit_controllers-k8s_custom_controllers/crdSchema/iseclHostAttributesSchema"
 	"log"
+	"os"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -25,6 +27,10 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
 )
+
+var StringReg = regexp.MustCompile("(^[a-zA-Z0-9_///.-]*$)")
+
+const MAX_BYTES_LEN = 200
 
 type IseclHAController struct {
 	indexer  cache.Indexer
@@ -165,9 +171,15 @@ func GetHaObjLabel(obj ha_schema.Host, node *api.Node, trustedPrefixConf string)
 	var annotation = make(crdLabelAnnotate.Annotations, 1)
 	trustPresent := false
 	trustLabelWithPrefix, err := getPrefixFromConf(trustedPrefixConf)
+
 	if err != nil {
 		return nil, nil, err
 	}
+
+	if !StringReg.MatchString(trustLabelWithPrefix) {
+		return nil, nil, errors.New("Invalid string formatted input")
+	}
+
 	trustLabelWithPrefix = trustLabelWithPrefix + trustlabel
 
 	for key, val := range obj.Assettag {
@@ -200,18 +212,25 @@ func GetHaObjLabel(obj ha_schema.Host, node *api.Node, trustedPrefixConf string)
 }
 
 func getPrefixFromConf(path string) (string, error) {
-	out, err := ioutil.ReadFile(path)
-	if err != nil {
-		glog.Errorf("Error: %s %v", path, err)
-		return "", err
-	}
-	s := Config{}
-	err = json.Unmarshal(out, &s)
-	if err != nil {
-		glog.Errorf("Error:  %v", err)
-		return "", err
-	}
-	return s.Trusted, nil
+        out, err := os.Open(path)
+        if err != nil {
+                glog.Errorf("Error: %s %v", path, err)
+                return "", err
+        }
+
+        defer out.Close()
+        readBytes := make([]byte, MAX_BYTES_LEN)
+        n, err := out.Read(readBytes)
+        if err != nil {
+                return "", err
+        }
+        s := Config{}
+        err = json.Unmarshal(readBytes[:n], &s)
+        if err != nil {
+                glog.Errorf("Error:  %v", err)
+                return "", err
+        }
+        return s.Trusted, nil
 }
 
 //AddHostAttributesTabObj Handler for addition event of the HA CRD
