@@ -19,10 +19,10 @@ import (
 	"time"
 
 	"github.com/golang/glog"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
 	k8sclient "k8s.io/client-go/kubernetes"
-	api "k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
@@ -164,7 +164,7 @@ func (c *IseclHAController) runWorker() {
 }
 
 //GetHaObjLabel creates lables and annotations map based on HA CRD
-func GetHaObjLabel(obj ha_schema.Host, node *api.Node, trustedPrefixConf string) (crdLabelAnnotate.Labels, crdLabelAnnotate.Annotations, error) {
+func GetHaObjLabel(obj ha_schema.Host, node *corev1.Node, trustedPrefixConf string) (crdLabelAnnotate.Labels, crdLabelAnnotate.Annotations, error) {
 	assetTagsize := len(obj.Assettag)
 
 	var lbl = make(crdLabelAnnotate.Labels, assetTagsize+2)
@@ -212,25 +212,25 @@ func GetHaObjLabel(obj ha_schema.Host, node *api.Node, trustedPrefixConf string)
 }
 
 func getPrefixFromConf(path string) (string, error) {
-        out, err := os.Open(path)
-        if err != nil {
-                glog.Errorf("Error: %s %v", path, err)
-                return "", err
-        }
+	out, err := os.Open(path)
+	if err != nil {
+		glog.Errorf("Error: %s %v", path, err)
+		return "", err
+	}
 
-        defer out.Close()
-        readBytes := make([]byte, MAX_BYTES_LEN)
-        n, err := out.Read(readBytes)
-        if err != nil {
-                return "", err
-        }
-        s := Config{}
-        err = json.Unmarshal(readBytes[:n], &s)
-        if err != nil {
-                glog.Errorf("Error:  %v", err)
-                return "", err
-        }
-        return s.Trusted, nil
+	defer out.Close()
+	readBytes := make([]byte, MAX_BYTES_LEN)
+	n, err := out.Read(readBytes)
+	if err != nil {
+		return "", err
+	}
+	s := Config{}
+	err = json.Unmarshal(readBytes[:n], &s)
+	if err != nil {
+		glog.Errorf("Error:  %v", err)
+		return "", err
+	}
+	return s.Trusted, nil
 }
 
 //AddHostAttributesTabObj Handler for addition event of the HA CRD
