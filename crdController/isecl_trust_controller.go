@@ -9,8 +9,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"k8s_custom_cit_controllers-k8s_custom_controllers/crdLabelAnnotate"
-	ha_schema "k8s_custom_cit_controllers-k8s_custom_controllers/crdSchema/iseclHostAttributesSchema"
+	"github.com/intel-secl/k8s-custom-controller/crdLabelAnnotate"
+	ha_schema "github.com/intel-secl/k8s-custom-controller/crdSchema/api/hostattribute/v1beta1"
+	ha_client "github.com/intel-secl/k8s-custom-controller/crdSchema/client/clientset/versioned/typed/hostattribute/v1beta1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"log"
 	"os"
 	"regexp"
@@ -20,7 +22,10 @@ import (
 
 	"github.com/golang/glog"
 	corev1 "k8s.io/api/core/v1"
+	runtime2 "k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/runtime"
+	"k8s.io/apimachinery/pkg/watch"
+
 	"k8s.io/apimachinery/pkg/util/wait"
 	k8sclient "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -259,18 +264,26 @@ func AddHostAttributesTabObj(haobj *ha_schema.HostAttributesCrd, helper crdLabel
 //NewIseclHAIndexerInformer returns informer for HA CRD object
 func NewIseclHAIndexerInformer(config *rest.Config, queue workqueue.RateLimitingInterface, crdMutex *sync.Mutex, trustedPrefixConf string) (cache.Indexer, cache.Controller) {
 	// Create a new clientset which include our CRD schema
-	crdcs, scheme, err := ha_schema.NewHAClient(config)
+	hacrdclient, err := ha_client.NewForConfig(config)
 	if err != nil {
 		log.Fatalf("Failed to create new clientset for Platform CRD %v", err)
 	}
 
-	// Create a CRD client interface
-	hacrdclient := ha_schema.HAClient(crdcs, scheme, "default")
+	listWatch := &cache.ListWatch{
+		ListFunc: func(options metav1.ListOptions) (runtime2.Object, error) {
+			// list all of the host attributes in the default namespace
+			return hacrdclient.HostAttributesCrds(metav1.NamespaceDefault).List(options)
+		},
+		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+			// watch all of the host attributes in the default namespace
+			return hacrdclient.HostAttributesCrds(metav1.NamespaceDefault).Watch(options)
+		},
+	}
 
 	//Create a PL CRD Helper object
 	hInf, cli := crdLabelAnnotate.Getk8sClientHelper(config)
 
-	return cache.NewIndexerInformer(hacrdclient.NewHAListWatch(), &ha_schema.HostAttributesCrd{}, 0, cache.ResourceEventHandlerFuncs{
+	return cache.NewIndexerInformer(listWatch, &ha_schema.HostAttributesCrd{}, 0, cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(obj)
 			glog.Info("Received Add event for ", key)

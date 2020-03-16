@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 package crdController
 
 import (
-	trust_schema "k8s_custom_cit_controllers-k8s_custom_controllers/crdSchema/iseclHostAttributesSchema"
+	trust_schema "github.com/intel-secl/k8s-custom-controller/crdSchema/api/hostattribute/v1beta1"
 	"testing"
 
 	corev1 "k8s.io/api/core/v1"

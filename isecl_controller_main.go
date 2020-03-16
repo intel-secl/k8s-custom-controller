@@ -8,7 +8,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"k8s_custom_cit_controllers-k8s_custom_controllers/crdController"
+	"github.com/intel-secl/k8s-custom-controller/crdController"
 	"sync"
 
 	"github.com/golang/glog"
