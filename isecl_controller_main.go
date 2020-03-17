@@ -7,7 +7,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"github.com/intel-secl/k8s-custom-controller/crdController"
 	"sync"
 
@@ -29,17 +28,8 @@ func main() {
 
 	glog.V(4).Infof("Starting ISecL Custom Controller")
 
-	var Usage = func() {
-		fmt.Println("Usage: ./isecl-k8s-controller-1.0-SNAPSHOT -kubeconf=<file path>")
-	}
-
 	kubeConf := flag.String("kubeconf", "", "Path to a kube config. ")
 	flag.Parse()
-
-	if *kubeConf == "" {
-		Usage()
-		return
-	}
 
 	config, err := GetClientConfig(*kubeConf)
 	if err != nil {
