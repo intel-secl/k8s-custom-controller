@@ -29,6 +29,7 @@ func main() {
 	glog.V(4).Infof("Starting ISecL Custom Controller")
 
 	kubeConf := flag.String("kubeconf", "", "Path to a kube config. ")
+	skipCrdCreate := flag.Bool("skip-crd-create", false, "skip crd creation in code")
 	flag.Parse()
 
 	config, err := GetClientConfig(*kubeConf)
@@ -46,14 +47,16 @@ func main() {
 	//Create mutex to sync operation between the two CRD threads
 	var crdmutex = &sync.Mutex{}
 
-	CrdDef := crdController.GetHACrdDef()
+        if !*skipCrdCreate {
+                CrdDef := crdController.GetHACrdDef()
 
-	//crdController.NewIseclCustomResourceDefinition to create CRD
-	err = crdController.NewIseclCustomResourceDefinition(cs, &CrdDef)
-	if err != nil {
-		glog.Errorf("Error in creating platform CRD %v", err)
-		return
-	}
+                //crdController.NewIseclCustomResourceDefinition to create CRD
+                err = crdController.NewIseclCustomResourceDefinition(cs, &CrdDef)
+                if err != nil {
+                        glog.Errorf("Error in creating platform CRD %v", err)
+                        return
+                }
+        }
 
 	// Create a queue
 	queue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "iseclcontroller")
