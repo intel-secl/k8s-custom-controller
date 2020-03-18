@@ -57,6 +57,3 @@ spec:
         - name: secl-controller
           image: lumjjb/isecl-controller:latest
           imagePullPolicy: Always
-          command: [ "/bin/bash", "-c", "--" ]
-          args: [ "while true; do sleep 300; done;" ]
-
