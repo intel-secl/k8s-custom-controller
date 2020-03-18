@@ -20,8 +20,8 @@ package fake
 
 import (
 	clientset "github.com/intel-secl/k8s-custom-controller/crdSchema/client/clientset/versioned"
-	crdv1beta1 "github.com/intel-secl/k8s-custom-controller/crdSchema/client/clientset/versioned/typed/hostattribute/v1beta1"
-	fakecrdv1beta1 "github.com/intel-secl/k8s-custom-controller/crdSchema/client/clientset/versioned/typed/hostattribute/v1beta1/fake"
+	crdv1beta1 "github.com/intel-secl/k8s-custom-controller/crdSchema/client/clientset/versioned/typed/hostattributes/v1beta1"
+	fakecrdv1beta1 "github.com/intel-secl/k8s-custom-controller/crdSchema/client/clientset/versioned/typed/hostattributes/v1beta1/fake"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/discovery"
