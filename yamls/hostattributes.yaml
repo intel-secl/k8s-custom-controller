@@ -1,0 +1,10 @@
+apiVersion: crd.isecl.intel.com/v1beta1
+kind: HostAttributes
+metadata:
+  name: secl-host-attributes
+spec:
+    hostList:
+    - hostName: "test"
+      trusted: "true"
+      validTo: "someDate"
+      assetTags: {}
