@@ -24,7 +24,7 @@ import (
 	time "time"
 
 	versioned "github.com/intel-secl/k8s-custom-controller/crdSchema/client/clientset/versioned"
-	hostattributes "github.com/intel-secl/k8s-custom-controller/crdSchema/client/informers/externalversions/hostattributes"
+	hostattributescrd "github.com/intel-secl/k8s-custom-controller/crdSchema/client/informers/externalversions/hostattributescrd"
 	internalinterfaces "github.com/intel-secl/k8s-custom-controller/crdSchema/client/informers/externalversions/internalinterfaces"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
@@ -172,9 +172,9 @@ type SharedInformerFactory interface {
 	ForResource(resource schema.GroupVersionResource) (GenericInformer, error)
 	WaitForCacheSync(stopCh <-chan struct{}) map[reflect.Type]bool
 
-	Crd() hostattributes.Interface
+	Crd() hostattributescrd.Interface
 }
 
-func (f *sharedInformerFactory) Crd() hostattributes.Interface {
-	return hostattributes.New(f, f.namespace, f.tweakListOptions)
+func (f *sharedInformerFactory) Crd() hostattributescrd.Interface {
+	return hostattributescrd.New(f, f.namespace, f.tweakListOptions)
 }

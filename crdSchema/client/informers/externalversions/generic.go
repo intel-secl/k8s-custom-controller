@@ -21,7 +21,7 @@ package externalversions
 import (
 	"fmt"
 
-	v1beta1 "github.com/intel-secl/k8s-custom-controller/crdSchema/api/hostattributes/v1beta1"
+	v1beta1 "github.com/intel-secl/k8s-custom-controller/crdSchema/api/hostattributescrd/v1beta1"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	cache "k8s.io/client-go/tools/cache"
 )
@@ -53,8 +53,8 @@ func (f *genericInformer) Lister() cache.GenericLister {
 func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource) (GenericInformer, error) {
 	switch resource {
 	// Group=crd.isecl.intel.com, Version=v1beta1
-	case v1beta1.SchemeGroupVersion.WithResource("hostattributeses"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Crd().V1beta1().HostAttributeses().Informer()}, nil
+	case v1beta1.SchemeGroupVersion.WithResource("hostattributescrds"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Crd().V1beta1().HostAttributesCrds().Informer()}, nil
 
 	}
 

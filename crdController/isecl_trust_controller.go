@@ -10,8 +10,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/intel-secl/k8s-custom-controller/crdLabelAnnotate"
-	ha_schema "github.com/intel-secl/k8s-custom-controller/crdSchema/api/hostattributes/v1beta1"
-	ha_client "github.com/intel-secl/k8s-custom-controller/crdSchema/client/clientset/versioned/typed/hostattributes/v1beta1"
+	ha_schema "github.com/intel-secl/k8s-custom-controller/crdSchema/api/hostattributescrd/v1beta1"
+	ha_client "github.com/intel-secl/k8s-custom-controller/crdSchema/client/clientset/versioned/typed/hostattributescrd/v1beta1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"log"
 	"os"
@@ -240,7 +240,7 @@ func getPrefixFromConf(path string) (string, error) {
 }
 
 //AddHostAttributesTabObj Handler for addition event of the HA CRD
-func AddHostAttributesTabObj(haobj *ha_schema.HostAttributes, helper crdLabelAnnotate.APIHelpers, cli *k8sclient.Clientset, mutex *sync.Mutex, trustedPrefixConf string) {
+func AddHostAttributesTabObj(haobj *ha_schema.HostAttributesCrd, helper crdLabelAnnotate.APIHelpers, cli *k8sclient.Clientset, mutex *sync.Mutex, trustedPrefixConf string) {
 	for index, ele := range haobj.Spec.HostList {
 		nodeName := haobj.Spec.HostList[index].Hostname
 		node, err := helper.GetNode(cli, nodeName)
@@ -273,22 +273,22 @@ func NewIseclHAIndexerInformer(config *rest.Config, queue workqueue.RateLimiting
 	listWatch := &cache.ListWatch{
 		ListFunc: func(options metav1.ListOptions) (runtime2.Object, error) {
 			// list all of the host attributes in the default namespace
-			return hacrdclient.HostAttributeses(metav1.NamespaceDefault).List(options)
+			return hacrdclient.HostAttributesCrds(metav1.NamespaceDefault).List(options)
 		},
 		WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
 			// watch all of the host attributes in the default namespace
-			return hacrdclient.HostAttributeses(metav1.NamespaceDefault).Watch(options)
+			return hacrdclient.HostAttributesCrds(metav1.NamespaceDefault).Watch(options)
 		},
 	}
 
 	//Create a PL CRD Helper object
 	hInf, cli := crdLabelAnnotate.Getk8sClientHelper(config)
 
-	return cache.NewIndexerInformer(listWatch, &ha_schema.HostAttributes{}, 0, cache.ResourceEventHandlerFuncs{
+	return cache.NewIndexerInformer(listWatch, &ha_schema.HostAttributesCrd{}, 0, cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(obj)
 			glog.Info("Received Add event for ", key)
-			haobj := obj.(*ha_schema.HostAttributes)
+			haobj := obj.(*ha_schema.HostAttributesCrd)
 			if err == nil {
 				queue.Add(key)
 			}
@@ -297,7 +297,7 @@ func NewIseclHAIndexerInformer(config *rest.Config, queue workqueue.RateLimiting
 		UpdateFunc: func(old interface{}, new interface{}) {
 			key, err := cache.MetaNamespaceKeyFunc(new)
 			glog.Info("Received Update event for ", key)
-			haobj := new.(*ha_schema.HostAttributes)
+			haobj := new.(*ha_schema.HostAttributesCrd)
 			if err == nil {
 				queue.Add(key)
 			}

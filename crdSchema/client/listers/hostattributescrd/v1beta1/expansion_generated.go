@@ -18,10 +18,10 @@ limitations under the License.
 
 package v1beta1
 
-// HostAttributesListerExpansion allows custom methods to be added to
-// HostAttributesLister.
-type HostAttributesListerExpansion interface{}
+// HostAttributesCrdListerExpansion allows custom methods to be added to
+// HostAttributesCrdLister.
+type HostAttributesCrdListerExpansion interface{}
 
-// HostAttributesNamespaceListerExpansion allows custom methods to be added to
-// HostAttributesNamespaceLister.
-type HostAttributesNamespaceListerExpansion interface{}
+// HostAttributesCrdNamespaceListerExpansion allows custom methods to be added to
+// HostAttributesCrdNamespaceLister.
+type HostAttributesCrdNamespaceListerExpansion interface{}

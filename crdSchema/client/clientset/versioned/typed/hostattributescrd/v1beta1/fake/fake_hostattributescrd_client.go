@@ -19,7 +19,7 @@ limitations under the License.
 package fake
 
 import (
-	v1beta1 "github.com/intel-secl/k8s-custom-controller/crdSchema/client/clientset/versioned/typed/hostattributes/v1beta1"
+	v1beta1 "github.com/intel-secl/k8s-custom-controller/crdSchema/client/clientset/versioned/typed/hostattributescrd/v1beta1"
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
 )
@@ -28,8 +28,8 @@ type FakeCrdV1beta1 struct {
 	*testing.Fake
 }
 
-func (c *FakeCrdV1beta1) HostAttributeses(namespace string) v1beta1.HostAttributesInterface {
-	return &FakeHostAttributeses{c, namespace}
+func (c *FakeCrdV1beta1) HostAttributesCrds(namespace string) v1beta1.HostAttributesCrdInterface {
+	return &FakeHostAttributesCrds{c, namespace}
 }
 
 // RESTClient returns a RESTClient that is used to communicate

@@ -1,5 +1,5 @@
 apiVersion: crd.isecl.intel.com/v1beta1
-kind: HostAttributes
+kind: HostAttributesCrd
 metadata:
   name: secl-host-attributes
 spec:

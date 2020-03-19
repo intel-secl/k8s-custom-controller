@@ -24,8 +24,8 @@ import (
 
 // Interface provides access to all the informers in this group version.
 type Interface interface {
-	// HostAttributeses returns a HostAttributesInformer.
-	HostAttributeses() HostAttributesInformer
+	// HostAttributesCrds returns a HostAttributesCrdInformer.
+	HostAttributesCrds() HostAttributesCrdInformer
 }
 
 type version struct {
@@ -39,7 +39,7 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// HostAttributeses returns a HostAttributesInformer.
-func (v *version) HostAttributeses() HostAttributesInformer {
-	return &hostAttributesInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+// HostAttributesCrds returns a HostAttributesCrdInformer.
+func (v *version) HostAttributesCrds() HostAttributesCrdInformer {
+	return &hostAttributesCrdInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

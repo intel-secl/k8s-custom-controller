@@ -10,9 +10,9 @@ import (
 )
 
 const (
-	HAPlural   string = "hostattributeses"
-	HASingular string = "hostattributes"
-	HAKind     string = "HostAttributes"
+	HAPlural   string = "hostattributescrds"
+	HASingular string = "hostattributescrd"
+	HAKind     string = "HostAttributesCrd"
 	HAGroup    string = "crd.isecl.intel.com"
 	HAVersion  string = "v1beta1"
 )
@@ -20,7 +20,7 @@ const (
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +kubebuilder:subresource:status
-type HostAttributes struct {
+type HostAttributesCrd struct {
 	meta_v1.TypeMeta   `json:",inline"`
 	meta_v1.ObjectMeta `json:"metadata"`
 	Spec               Spec `json:"spec"`
@@ -39,8 +39,8 @@ type Spec struct {
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-type HostAttributesList struct {
+type HostAttributesCrdList struct {
 	meta_v1.TypeMeta `json:",inline"`
 	meta_v1.ListMeta `json:"metadata"`
-	Items            []HostAttributes `json:"items"`
+	Items            []HostAttributesCrd `json:"items"`
 }

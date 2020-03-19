@@ -19,14 +19,14 @@ limitations under the License.
 package v1beta1
 
 import (
-	v1beta1 "github.com/intel-secl/k8s-custom-controller/crdSchema/api/hostattributes/v1beta1"
+	v1beta1 "github.com/intel-secl/k8s-custom-controller/crdSchema/api/hostattributescrd/v1beta1"
 	"github.com/intel-secl/k8s-custom-controller/crdSchema/client/clientset/versioned/scheme"
 	rest "k8s.io/client-go/rest"
 )
 
 type CrdV1beta1Interface interface {
 	RESTClient() rest.Interface
-	HostAttributesesGetter
+	HostAttributesCrdsGetter
 }
 
 // CrdV1beta1Client is used to interact with features provided by the crd.isecl.intel.com group.
@@ -34,8 +34,8 @@ type CrdV1beta1Client struct {
 	restClient rest.Interface
 }
 
-func (c *CrdV1beta1Client) HostAttributeses(namespace string) HostAttributesInterface {
-	return newHostAttributeses(c, namespace)
+func (c *CrdV1beta1Client) HostAttributesCrds(namespace string) HostAttributesCrdInterface {
+	return newHostAttributesCrds(c, namespace)
 }
 
 // NewForConfig creates a new CrdV1beta1Client for the given config.
