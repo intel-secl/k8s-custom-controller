@@ -26,6 +26,8 @@ spec:
                       hostName:
                         type: string
                       trusted:
+                        type: boolean
+                      signedTrustReport:
                         type: string
                       validTo:
                         type: string

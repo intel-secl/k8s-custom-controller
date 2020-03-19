@@ -4,7 +4,8 @@ metadata:
   name: secl-host-attributes
 spec:
     hostList:
-    - hostName: "test"
-      trusted: "true"
+    - hostName: "minikube"
+      trusted: true
+      signedTrustReport: "some trust report"
       validTo: "someDate"
       assetTags: {}

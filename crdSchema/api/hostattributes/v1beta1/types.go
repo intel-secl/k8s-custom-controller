@@ -28,7 +28,7 @@ type HostAttributes struct {
 
 type Host struct {
 	Hostname     string            `json:"hostName"`
-	Trusted      string            `json:"trusted"`
+	Trusted      bool              `json:"trusted"`
 	Expiry       string            `json:"validTo"`
 	SignedReport string            `json:"signedTrustReport"`
 	Assettag     map[string]string `json:"assetTags"`

@@ -16,6 +16,7 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -197,17 +198,17 @@ func GetHaObjLabel(obj ha_schema.Host, node *corev1.Node, trustedPrefixConf stri
 	for key, value := range node.Labels {
 		if key == trustLabelWithPrefix {
 			trustPresent = true
-			if value == obj.Trusted {
+			if value == strconv.FormatBool(obj.Trusted) {
 				glog.Info("No change in Trustlabel, updating Trustexpiry time only")
 			} else {
 				glog.Info("Updating Complete Trustlabel for the node")
-				lbl[trustLabelWithPrefix] = obj.Trusted
+				lbl[trustLabelWithPrefix] = strconv.FormatBool(obj.Trusted)
 			}
 		}
 	}
 	if !trustPresent {
 		glog.Info("Trust value was not present on node adding for first time")
-		lbl[trustLabelWithPrefix] = obj.Trusted
+		lbl[trustLabelWithPrefix] = strconv.FormatBool(obj.Trusted)
 	}
 	expiry := strings.Replace(obj.Expiry, ":", ".", -1)
 	lbl[trustexpiry] = expiry
@@ -252,9 +253,9 @@ func AddHostAttributesTabObj(haobj *ha_schema.HostAttributes, helper crdLabelAnn
 			log.Fatalf("Error: %v", err)
 		}
 		mutex.Lock()
+		defer mutex.Unlock()
 		helper.AddLabelsAnnotations(node, lbl, ann)
 		err = helper.UpdateNode(cli, node)
-		mutex.Unlock()
 		if err != nil {
 			glog.Info("can't update node: %s", err.Error())
 		}
