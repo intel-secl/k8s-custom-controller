@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	HAPlural   string = "hostattributescrds"
-	HASingular string = "hostattributescrd"
+	HAPlural   string = "hostattributes"
+	HASingular string = "hostattribute"
 	HAKind     string = "HostAttributesCrd"
 	HAGroup    string = "crd.isecl.intel.com"
 	HAVersion  string = "v1beta1"

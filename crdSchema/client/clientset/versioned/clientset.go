@@ -21,7 +21,7 @@ package versioned
 import (
 	"fmt"
 
-	crdv1beta1 "github.com/intel-secl/k8s-custom-controller/crdSchema/client/clientset/versioned/typed/hostattributescrd/v1beta1"
+	crdv1beta1 "github.com/intel-secl/k8s-custom-controller/crdSchema/client/clientset/versioned/typed/hostattribute/v1beta1"
 	discovery "k8s.io/client-go/discovery"
 	rest "k8s.io/client-go/rest"
 	flowcontrol "k8s.io/client-go/util/flowcontrol"

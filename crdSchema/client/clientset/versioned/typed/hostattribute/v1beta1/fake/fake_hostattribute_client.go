@@ -19,7 +19,7 @@ limitations under the License.
 package fake
 
 import (
-	v1beta1 "github.com/intel-secl/k8s-custom-controller/crdSchema/client/clientset/versioned/typed/hostattributescrd/v1beta1"
+	v1beta1 "github.com/intel-secl/k8s-custom-controller/crdSchema/client/clientset/versioned/typed/hostattribute/v1beta1"
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
 )

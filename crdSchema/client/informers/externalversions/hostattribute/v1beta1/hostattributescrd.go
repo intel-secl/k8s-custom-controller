@@ -21,10 +21,10 @@ package v1beta1
 import (
 	time "time"
 
-	hostattributescrdv1beta1 "github.com/intel-secl/k8s-custom-controller/crdSchema/api/hostattributescrd/v1beta1"
+	hostattributev1beta1 "github.com/intel-secl/k8s-custom-controller/crdSchema/api/hostattribute/v1beta1"
 	versioned "github.com/intel-secl/k8s-custom-controller/crdSchema/client/clientset/versioned"
 	internalinterfaces "github.com/intel-secl/k8s-custom-controller/crdSchema/client/informers/externalversions/internalinterfaces"
-	v1beta1 "github.com/intel-secl/k8s-custom-controller/crdSchema/client/listers/hostattributescrd/v1beta1"
+	v1beta1 "github.com/intel-secl/k8s-custom-controller/crdSchema/client/listers/hostattribute/v1beta1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
@@ -70,7 +70,7 @@ func NewFilteredHostAttributesCrdInformer(client versioned.Interface, namespace 
 				return client.CrdV1beta1().HostAttributesCrds(namespace).Watch(options)
 			},
 		},
-		&hostattributescrdv1beta1.HostAttributesCrd{},
+		&hostattributev1beta1.HostAttributesCrd{},
 		resyncPeriod,
 		indexers,
 	)
@@ -81,7 +81,7 @@ func (f *hostAttributesCrdInformer) defaultInformer(client versioned.Interface, 
 }
 
 func (f *hostAttributesCrdInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&hostattributescrdv1beta1.HostAttributesCrd{}, f.defaultInformer)
+	return f.factory.InformerFor(&hostattributev1beta1.HostAttributesCrd{}, f.defaultInformer)
 }
 
 func (f *hostAttributesCrdInformer) Lister() v1beta1.HostAttributesCrdLister {

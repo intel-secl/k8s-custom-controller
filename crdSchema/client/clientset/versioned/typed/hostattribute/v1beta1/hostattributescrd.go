@@ -21,7 +21,7 @@ package v1beta1
 import (
 	"time"
 
-	v1beta1 "github.com/intel-secl/k8s-custom-controller/crdSchema/api/hostattributescrd/v1beta1"
+	v1beta1 "github.com/intel-secl/k8s-custom-controller/crdSchema/api/hostattribute/v1beta1"
 	scheme "github.com/intel-secl/k8s-custom-controller/crdSchema/client/clientset/versioned/scheme"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -67,7 +67,7 @@ func (c *hostAttributesCrds) Get(name string, options v1.GetOptions) (result *v1
 	result = &v1beta1.HostAttributesCrd{}
 	err = c.client.Get().
 		Namespace(c.ns).
-		Resource("hostattributescrds").
+		Resource("hostattributes").
 		Name(name).
 		VersionedParams(&options, scheme.ParameterCodec).
 		Do().
@@ -84,7 +84,7 @@ func (c *hostAttributesCrds) List(opts v1.ListOptions) (result *v1beta1.HostAttr
 	result = &v1beta1.HostAttributesCrdList{}
 	err = c.client.Get().
 		Namespace(c.ns).
-		Resource("hostattributescrds").
+		Resource("hostattributes").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
 		Do().
@@ -101,7 +101,7 @@ func (c *hostAttributesCrds) Watch(opts v1.ListOptions) (watch.Interface, error)
 	opts.Watch = true
 	return c.client.Get().
 		Namespace(c.ns).
-		Resource("hostattributescrds").
+		Resource("hostattributes").
 		VersionedParams(&opts, scheme.ParameterCodec).
 		Timeout(timeout).
 		Watch()
@@ -112,7 +112,7 @@ func (c *hostAttributesCrds) Create(hostAttributesCrd *v1beta1.HostAttributesCrd
 	result = &v1beta1.HostAttributesCrd{}
 	err = c.client.Post().
 		Namespace(c.ns).
-		Resource("hostattributescrds").
+		Resource("hostattributes").
 		Body(hostAttributesCrd).
 		Do().
 		Into(result)
@@ -124,7 +124,7 @@ func (c *hostAttributesCrds) Update(hostAttributesCrd *v1beta1.HostAttributesCrd
 	result = &v1beta1.HostAttributesCrd{}
 	err = c.client.Put().
 		Namespace(c.ns).
-		Resource("hostattributescrds").
+		Resource("hostattributes").
 		Name(hostAttributesCrd.Name).
 		Body(hostAttributesCrd).
 		Do().
@@ -136,7 +136,7 @@ func (c *hostAttributesCrds) Update(hostAttributesCrd *v1beta1.HostAttributesCrd
 func (c *hostAttributesCrds) Delete(name string, options *v1.DeleteOptions) error {
 	return c.client.Delete().
 		Namespace(c.ns).
-		Resource("hostattributescrds").
+		Resource("hostattributes").
 		Name(name).
 		Body(options).
 		Do().
@@ -151,7 +151,7 @@ func (c *hostAttributesCrds) DeleteCollection(options *v1.DeleteOptions, listOpt
 	}
 	return c.client.Delete().
 		Namespace(c.ns).
-		Resource("hostattributescrds").
+		Resource("hostattributes").
 		VersionedParams(&listOptions, scheme.ParameterCodec).
 		Timeout(timeout).
 		Body(options).
@@ -164,7 +164,7 @@ func (c *hostAttributesCrds) Patch(name string, pt types.PatchType, data []byte,
 	result = &v1beta1.HostAttributesCrd{}
 	err = c.client.Patch(pt).
 		Namespace(c.ns).
-		Resource("hostattributescrds").
+		Resource("hostattributes").
 		SubResource(subresources...).
 		Name(name).
 		Body(data).
