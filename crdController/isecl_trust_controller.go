@@ -254,7 +254,6 @@ func AddHostAttributesTabObj(haobj *ha_schema.HostAttributesCrd, helper crdLabel
 			log.Fatalf("Error: %v", err)
 		}
 		mutex.Lock()
-		defer mutex.Unlock()
 		helper.AddLabelsAnnotations(node, lbl, ann)
 
 		if DeleteUntrustedNodes {
@@ -276,6 +275,7 @@ func AddHostAttributesTabObj(haobj *ha_schema.HostAttributesCrd, helper crdLabel
 				glog.Info("can't delete update node: %s", err.Error())
 			}
 		}
+                mutex.Unlock()
 	}
 }
 
