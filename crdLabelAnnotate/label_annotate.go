@@ -9,6 +9,7 @@ import (
 	"github.com/golang/glog"
 	"github.com/pkg/errors"
 	corev1 "k8s.io/api/core/v1"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8sclient "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -26,6 +27,9 @@ type APIHelpers interface {
 
 	// UpdateNode updates the node via the API server using a client.
 	UpdateNode(*k8sclient.Clientset, *corev1.Node) error
+
+	// DeleteNode deletes the node name via the API server using a client.
+	DeleteNode(*k8sclient.Clientset, string) error
 
 	// AddTaint modifies the supplied node's taints to add an additional taint
 	// effect should be one of: NoSchedule, PreferNoSchedule, NoExecute
@@ -96,6 +100,22 @@ func (h K8sHelpers) AddTaint(n *corev1.Node, key string, value string, effect st
 func (h K8sHelpers) UpdateNode(c *k8sclient.Clientset, n *corev1.Node) error {
 	// Send the updated node to the apiserver.
 	_, err := c.CoreV1().Nodes().Update(n)
+	if err != nil {
+		glog.Errorf("Error while updating node label:", err.Error())
+		return err
+	}
+	return nil
+}
+
+//UpdateNode updates the node API
+func (h K8sHelpers) DeleteNode(c *k8sclient.Clientset, nodeName string) error {
+	// Send the updated node to the apiserver.
+	err := c.CoreV1().Nodes().Delete(nodeName, &metav1.DeleteOptions{})
+
+	// Node already deleted
+	if k8serrors.IsNotFound(err) {
+		return nil
+	}
 	if err != nil {
 		glog.Errorf("Error while updating node label:", err.Error())
 		return err

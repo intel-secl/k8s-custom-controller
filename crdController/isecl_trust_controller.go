@@ -35,6 +35,7 @@ import (
 )
 
 var StringReg = regexp.MustCompile("(^[a-zA-Z0-9_///.-]*$)")
+var DeleteUntrustedNodes = false
 
 const MAX_BYTES_LEN = 200
 
@@ -255,9 +256,25 @@ func AddHostAttributesTabObj(haobj *ha_schema.HostAttributesCrd, helper crdLabel
 		mutex.Lock()
 		defer mutex.Unlock()
 		helper.AddLabelsAnnotations(node, lbl, ann)
+
+		if DeleteUntrustedNodes {
+			// Taint the node with no execute
+			if err = helper.AddTaint(node, "untrusted", "true", "NoExecute"); err != nil {
+				glog.Info("unable to add taints: %s", err.Error())
+			}
+		}
+
 		err = helper.UpdateNode(cli, node)
 		if err != nil {
 			glog.Info("can't update node: %s", err.Error())
+		}
+
+		// Remove node
+		if DeleteUntrustedNodes && !ele.Trusted {
+			err := helper.DeleteNode(cli, nodeName)
+			if err != nil {
+				glog.Info("can't delete update node: %s", err.Error())
+			}
 		}
 	}
 }

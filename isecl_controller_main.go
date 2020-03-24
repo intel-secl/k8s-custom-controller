@@ -30,6 +30,7 @@ func main() {
 
 	kubeConf := flag.String("kubeconf", "", "Path to a kube config. ")
 	skipCrdCreate := flag.Bool("skip-crd-create", false, "skip crd creation in code")
+	deleteUntrustedNodes := flag.Bool("delete-untrusted-nodes", false, "delete nodes when trust status is no longer trusted")
 	flag.Parse()
 
 	config, err := GetClientConfig(*kubeConf)
@@ -47,16 +48,20 @@ func main() {
 	//Create mutex to sync operation between the two CRD threads
 	var crdmutex = &sync.Mutex{}
 
-        if !*skipCrdCreate {
-                CrdDef := crdController.GetHACrdDef()
+	if !*skipCrdCreate {
+		CrdDef := crdController.GetHACrdDef()
 
-                //crdController.NewIseclCustomResourceDefinition to create CRD
-                err = crdController.NewIseclCustomResourceDefinition(cs, &CrdDef)
-                if err != nil {
-                        glog.Errorf("Error in creating platform CRD %v", err)
-                        return
-                }
-        }
+		//crdController.NewIseclCustomResourceDefinition to create CRD
+		err = crdController.NewIseclCustomResourceDefinition(cs, &CrdDef)
+		if err != nil {
+			glog.Errorf("Error in creating platform CRD %v", err)
+			return
+		}
+	}
+
+	if *deleteUntrustedNodes {
+		crdController.DeleteUntrustedNodes = true
+	}
 
 	// Create a queue
 	queue := workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "iseclcontroller")
